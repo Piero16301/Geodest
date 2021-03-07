@@ -12,7 +12,7 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     Timer(const Duration(milliseconds: 3000), () {
-      Navigator.pushNamed(context, 'deliveries');
+      Navigator.pushNamed(context, 'login');
     });
   }
 
@@ -21,14 +21,15 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          /*gradient: LinearGradient(
             colors: [primaryColor, secondaryColor],
             end: Alignment.bottomCenter,
             begin: Alignment.topCenter,
-          ),
+          ),*/
+          color: Colors.white,
         ),
         child: Center(
-          child: Image.asset("assets/logo.png", height: 250),
+          child: Image.asset("assets/logo_green.png", height: 200),
         ),
       ),
     );

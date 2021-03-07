@@ -1,55 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:geodest/utils/colors.dart';
 
 class SpeedDialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SpeedDial(
-      marginEnd: 18,
+      marginEnd: 20,
       marginBottom: 20,
       icon: Icons.add,
       activeIcon: Icons.remove,
-      buttonSize: 56.0,
-      visible: true,
-      closeManually: false,
-      curve: Curves.bounceIn,
-      overlayColor: Colors.black,
+      buttonSize: 60,
       overlayOpacity: 0.5,
       onOpen: () => print('OPENING DIAL'),
       onClose: () => print('DIAL CLOSED'),
-      tooltip: 'Speed Dial',
-      heroTag: 'speed-dial-hero-tag',
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
-      elevation: 8.0,
+      backgroundColor: primaryColor,
+      foregroundColor: Colors.white,
+      elevation: 5,
       shape: CircleBorder(),
       children: [
-        SpeedDialChild(
-          child: Icon(Icons.accessibility),
-          backgroundColor: Colors.red,
-          label: 'First',
-          labelStyle: TextStyle(fontSize: 18.0),
-          onTap: () => print('FIRST CHILD'),
-          onLongPress: () => print('FIRST CHILD LONG PRESS'),
-        ),
-        SpeedDialChild(
-          child: Icon(Icons.brush),
-          backgroundColor: Colors.blue,
-          label: 'Second',
-          labelStyle: TextStyle(fontSize: 18.0),
-          onTap: () => print('SECOND CHILD'),
-          onLongPress: () => print('SECOND CHILD LONG PRESS'),
-        ),
-        SpeedDialChild(
-          child: Icon(Icons.keyboard_voice),
-          backgroundColor: Colors.green,
-          label: 'Third',
-          labelStyle: TextStyle(fontSize: 18.0),
-          onTap: () => print('THIRD CHILD'),
-          onLongPress: () => print('THIRD CHILD LONG PRESS'),
-        ),
+        _dialChild(context: context, icon: Icons.location_on, color: Colors.red, label: "Compartir Ubicación", route: 'login'),
+        _dialChild(context: context, icon: Icons.update, color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
+        _dialChild(context: context, icon: Icons.add, color: Colors.green, label: "Añadir Envío", route: 'login'),
       ],
     );
   }
+
+  SpeedDialChild _dialChild({context, icon, color, label, route}) {
+    return SpeedDialChild(
+      child: Icon(icon),
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+      //labelBackgroundColor: Color(0xffF9D342),
+      labelBackgroundColor: color,
+      label: label,
+      labelStyle: TextStyle(
+        fontSize: 15,
+        //color: Color(0xff292826),
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      ),
+      onTap: () {
+        Navigator.pushNamed(context, route);
+      },
+    );
+  }
+
 }
 

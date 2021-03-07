@@ -1,13 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geodest/utils/colors.dart';
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+
+  String _selected = 'Vendedor';
+  List <String> _roles = ['Vendedor', 'Motorizado'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,8 +38,16 @@ class _LoginPageState extends State<LoginPage> {
                 child: ListView(
                   //mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
+
                     _textInput(hint: "Correo Electrónico", icon: Icons.email),
                     _textInput(hint: "Contraseña", icon: Icons.vpn_key),
+                    _textInput(hint: "Confirmar Contraseña", icon: Icons.vpn_key),
+                    _textInput(hint: "Nombres", icon: Icons.person),
+                    _textInput(hint: "Apellidos", icon: Icons.person),
+                    Container(height: 10),
+                    _createDropdown(),
+                    _textInput(hint: "Usuario del Motorizado", icon: Icons.motorcycle),
+
                     Container(height: 50),
                     Center(
                       child: SizedBox(
@@ -44,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: 40,
                         child: ElevatedButton(
                           child: Text(
-                            "INICIAR SESIÓN",
+                            "REGISTRARSE",
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.white,
@@ -63,39 +74,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     Container(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "¿Aún no tienes cuenta?",
-                          style: TextStyle(
-                            fontSize: 15,
-                          ),
-                        ),
-                        SizedBox(
-                          //width: MediaQuery.of(context).size.width,
-                          height: 40,
-                          child: ElevatedButton(
-                            child: Text(
-                              "REGISTRARSE",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: primaryColor,
-                              onPrimary: Colors.white,
-                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
-                            ),
-                            onPressed: () {
-                              Navigator.pushNamed(context, 'register');
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -108,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _textInput({controller, hint, icon}) {
     return Container(
-      margin: EdgeInsets.only(top: 40),
+      margin: EdgeInsets.only(top: 15),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(20)),
         color: Colors.white,
@@ -125,5 +103,37 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  List<DropdownMenuItem<String>> getOptionsDropdown() {
+    List <DropdownMenuItem<String>> lista = [];
+    _roles.forEach((role) {
+      lista.add(DropdownMenuItem(
+        child: Text(role),
+        value: role,
+      ));
+    });
+    return lista;
+  }
+
+  Widget _createDropdown() {
+    return Row(
+      children: <Widget>[
+        SizedBox(width: 20),
+        Icon(Icons.work, color: Colors.grey),
+        SizedBox(width: 30),
+        Expanded(
+          child: DropdownButton(
+            value: _selected,
+            items: getOptionsDropdown(),
+            onChanged: (opt) {
+              setState(() {
+                _selected = opt;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+  
 }
 

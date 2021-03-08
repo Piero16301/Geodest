@@ -6,12 +6,12 @@ class StorageService {
 
   static Future<void> saveRefreshToken(String refreshToken) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('refreshToken', refreshToken);
+    return await prefs.setString('refreshToken', refreshToken);
   }
 
   static Future<String> getRefreshToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('refreshToken');
+    return prefs.getString('refreshToken') ?? "";
   }
 
   static void removeRefreshToken() async {
@@ -23,12 +23,12 @@ class StorageService {
 
   static Future<void> saveAccessToken(String accessToken) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('accessToken', accessToken);
+    return await prefs.setString('accessToken', accessToken);
   }
 
   static Future<String> getAccessToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('accessToken');
+    return prefs.getString('accessToken') ?? "";
   }
 
   static void removeAccessToken() async {
@@ -40,12 +40,12 @@ class StorageService {
 
   static Future<void> saveEmail(String email) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', email);
+    return await prefs.setString('email', email);
   }
 
   static Future<String> getEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('email');
+    return prefs.getString('email') ?? "";
   }
 
   static void removeEmail() async {
@@ -57,15 +57,32 @@ class StorageService {
 
   static Future<void> saveUsername(String username) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', username);
+    return await prefs.setString('username', username);
   }
 
   static Future<String> getUsername() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('username');
+    return prefs.getString('username') ?? "";
   }
 
   static void removeUsername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('username');
+  }
+
+  /// is sharing location
+
+  static Future<void> saveIsSharingLocation(bool isOrNot) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.setBool('isSharingLocation', isOrNot);
+  }
+
+  static Future<bool> getIsSharingLocation() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isSharingLocation') ?? false;
+  }
+
+  static void removeIsSharingLocation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
   }

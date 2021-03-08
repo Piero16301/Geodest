@@ -1,10 +1,15 @@
-import 'package:geodest/interceptor/http_interceptor.dart';
-import 'package:geodest/services/storage_service.dart';
+import 'dart:convert';
+
+import 'package:geodest/models/delivery.dart';
+
+import '../interceptor/http_interceptor.dart';
+import './storage_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:core';
 import 'common_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-var client = AuthenticatedHttpClient();
+var client;
 var originalClient = http.Client();
 
 class ClientService {
@@ -12,9 +17,11 @@ class ClientService {
   /// login
 
   static Future<http.Response> login(Map<String, dynamic> body) async {
+    //FIXME: si da un error de 'Tried calling: getString("accessToken")' entonces no se instancio el authenticatedclient
+    client = AuthenticatedHttpClient(sharedPref: await SharedPreferences.getInstance());
     return await client.post(
-        Uri.https(CommonService.loginUrl, ''),
-        body: body,
+        Uri.parse(CommonService.loginUrl),
+        body: jsonEncode(body),
         headers: <String, String> {
           'Content-Type': 'application/json'
         }
@@ -25,8 +32,8 @@ class ClientService {
 
   static Future<http.Response> postDelivery(Map<String, dynamic> body) async {
     return await client.post(
-        Uri.https(CommonService.deliveryUrl, ''),
-        body: body,
+        Uri.parse(CommonService.deliveryUrl),
+        body: jsonEncode(body),
         headers: <String, String> {
           'Content-Type': 'application/json'
         }
@@ -35,7 +42,7 @@ class ClientService {
 
   static Future<http.Response> getDeliveries() async {
     return await client.get(
-        Uri.https(CommonService.deliveryUrl, ''),
+        Uri.parse(CommonService.deliveryUrl),
         headers: <String, String> {
           'Content-Type': 'application/json'
         }
@@ -44,7 +51,7 @@ class ClientService {
 
   static Future<http.Response> completeDelivery(int id) async {
     return await client.put(
-        Uri.https(CommonService.deliveryUrl, '/$id'),
+        Uri.parse("${CommonService.deliveryUrl}/$id"),
         headers: <String, String> {
           'Content-Type': 'application/json'
         }
@@ -57,15 +64,26 @@ class ClientService {
   static Future<http.Response> refreshToken() async {
     String refreshToken = await StorageService.getRefreshToken();
     return await originalClient.post(
-        Uri.https(CommonService.refreshTokenUrl, ''),
+        Uri.parse(CommonService.refreshTokenUrl),
         headers: <String, String> {
           'Content-Type': 'application/json'
         },
-        body: {
+        body: jsonEncode({
           'token': '$refreshToken'
-        }
+        })
     );
     //TODO: despues de esto, se debe guardar el nuevo access token (refresh se mantiene)
     //TODO: si el response da 401, logout al user sí o sí, decirle q la sesión ha expirado
   }
+
+  /// username
+  static Future<http.Response> getUsername() async {
+    return await client.get(
+      Uri.parse(CommonService.usernameUrl),
+      headers: <String, String> {
+        'Content-Type': 'application/json'
+      }
+    );
+  }
+
 }

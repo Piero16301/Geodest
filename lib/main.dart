@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:geodest/pages/deliveries_page.dart';
-import 'package:geodest/pages/login_page.dart';
-import 'package:geodest/pages/register_page.dart';
-import 'package:geodest/pages/splash_page.dart';
 
-void main() => runApp(MyApp());
+import './pages/deliveries_page.dart';
+import './pages/login_page.dart';
+import './pages/register_page.dart';
+import './pages/splash_page.dart';
+
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geodest/models/user.dart';
+import 'package:geodest/services/storage_service.dart';
 import 'package:geodest/utils/colors.dart';
+import '../services/client_service.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -8,6 +13,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  //TODO: validación del form
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,8 +45,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: ListView(
                   //mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
-                    _textInput(hint: "Correo Electrónico", icon: Icons.email),
-                    _textInput(hint: "Contraseña", icon: Icons.vpn_key),
+                    _textInput(hint: "Correo Electrónico", icon: Icons.email, controller: emailController),
+                    _textInput(hint: "Contraseña", icon: Icons.vpn_key, controller: passwordController),
                     Container(height: 50),
                     Center(
                       child: SizedBox(
@@ -57,7 +67,34 @@ class _LoginPageState extends State<LoginPage> {
                             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(context, 'deliveries');
+
+                            setIsLoading(waiting: true, context: context);
+
+                            ///lo de abajo es para debuggear
+                            // Future.delayed(Duration(seconds: 5)).then((_) {
+                            //   setIsLoading(waiting: false, context: context);
+                            // });
+
+                            User user = User(email: emailController.text, password: passwordController.text);
+
+                            ClientService.login(
+                              user.toJson()
+                            ).then((res) {
+                              if (res.statusCode == 200) {
+                                final body = jsonDecode(res.body);
+                                print("body del login: $body");
+                                //TODO: save Access and Refresh token
+                                StorageService.saveAccessToken(body['access']).then((_) {
+                                  StorageService.saveRefreshToken(body['refresh']).then((_) {
+                                    setIsLoading(waiting: false, context: context);
+                                    Navigator.pushNamed(context, 'deliveries');
+                                  });
+                                });
+                              } else {
+                                //TODO: dialog diciendo que las credenciales son incorrectas
+                              }
+                            });
+
                           },
                         ),
                       ),
@@ -90,6 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
                             ),
                             onPressed: () {
+                              //TODO: abrir redirigir al link de register
                               Navigator.pushNamed(context, 'register');
                             },
                           ),
@@ -104,6 +142,25 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void setIsLoading({bool waiting, BuildContext context}) {
+    if (waiting) {
+      showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: const Text('Iniciando sesión...'),
+              content: const CircularProgressIndicator(),
+              elevation: 30.0,
+
+            );
+          },
+          barrierDismissible: true, //FIXME: cambiar a false
+      );
+    } else {
+      Navigator.of(context).pop();
+    }
   }
 
   Widget _textInput({controller, hint, icon}) {

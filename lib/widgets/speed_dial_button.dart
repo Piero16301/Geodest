@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:geodest/utils/colors.dart';
+import 'package:background_location/background_location.dart';
 
+import '../services/location_service.dart';
+import '../services/storage_service.dart';
+import '../services/client_service.dart';
+
+//TODO: convertir a un staeful widget
+//TODO: darle un feedback al usuario para que se note que está compartiendo ubicación
 class SpeedDialButton extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return SpeedDial(
@@ -41,7 +49,14 @@ class SpeedDialButton extends StatelessWidget {
         fontWeight: FontWeight.bold,
       ),
       onTap: () {
-        Navigator.pushNamed(context, route);
+        BackgroundLocation.getPermissions(
+          onGranted: () {
+            LocationService.toggleLocationSharing();
+          },
+          onDenied: () {
+            LocationService.complainPermissionDenied(context);
+          },
+        );
       },
     );
   }

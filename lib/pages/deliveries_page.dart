@@ -19,6 +19,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
   List<Delivery> deliveries = [];
 
   void obtainDeliveries() {
+    //FIXME: aveces da 401
     ClientService.getDeliveries().then((res) {
       if (res.statusCode == 200) {
         List<dynamic> buff = jsonDecode(res.body) as List<dynamic>;
@@ -31,6 +32,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
           print("deliveries: $deliveries");
         });
       } else {
+        print(res.statusCode);
         print("[ERROR]: fetching deliveries");
       }
     });
@@ -56,12 +58,16 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       body: ListView.builder(
         itemCount: deliveries.length,
         itemBuilder: (BuildContext ctx, int idx) {
-          return ListTile(
-            leading: FlutterLogo(),
-            title: Text("${deliveries[idx].address}"),
-            onTap: () {
-              //TODO: show pedido details
-            },
+          return Card(
+            child: ListTile(
+              leading: Icon(Icons.motorcycle),
+              title: Text("${deliveries[idx].address}"),
+              subtitle: Text("${deliveries[idx].receiver} - ${deliveries[idx].phone}"),
+              trailing: Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                //TODO: show pedido details
+              },
+            ),
           );
         },
       ),

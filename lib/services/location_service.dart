@@ -22,26 +22,30 @@ class LocationService {
     String username = await StorageService.getUsername();
 
     // solo hacer el request cuando no tenemos username en disco
-    // if (username.isEmpty) {
-    //   http.Response res = await ClientService.getUsername();
-    //
-    //   if (res.statusCode == 200) {
-    //     final body = jsonDecode(res.body);
-    //     username = body.username;
-    //     await StorageService.saveUsername(username);
-    //   } else {
-    //     print("[ERROR]: when fetching username");
-    //     return;
-    //   }
-    // }
+    if (username.isEmpty) {
+      http.Response res = await ClientService.getUsername();
 
-    // channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username}/"));
+      if (res.statusCode == 200) {
+        final body = jsonDecode(res.body);
+        username = body['username'];
+        await StorageService.saveUsername(username);
+      } else {
+        print("[ERROR]: when fetching username");
+        return;
+      }
+    }
+
+    print("${CommonService.wsBaseUrl}/$username/");
+
+    channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
+
+
 
     /// lo de abajo es para debugging
     // channel = IOWebSocketChannel.connect(Uri.parse("wss://echo.websocket.org"));
-    // channel.stream.listen((event) {
-    //   print("WS response: $event");
-    // });
+    channel.stream.listen((event) {
+      print("WS response: $event");
+    });
 
     BackgroundLocation.setAndroidNotification(
       title: "Compartiendo tu ubicación...",
@@ -82,19 +86,19 @@ class LocationService {
     bool isMock;
   */
   static sendLocation(Location location) {
-    channel.sink.add(
-      "${location.longitude}, ${location.latitude}"
-    );
-    // channel.sink.add({
-    //   'message': "{\"lat\": ${location.latitude}, \"lng\": ${location.longitude}"
-    // });
+    // channel.sink.add(
+    //   "${location.longitude}, ${location.latitude}"
+    // );
+    channel.sink.add(jsonEncode({
+      'message': "{\"lat\": ${location.latitude}, \"lng\": ${location.longitude}"
+    }));
   }
 
   static stop() async {
     print("Dejando de compartir ubicación...");
     // channel.sink.close();
     BackgroundLocation.stopLocationService();
-    await StorageService.removeUsername();
+    // await StorageService.removeUsername();
     await StorageService.saveIsSharingLocation(false);
   }
 

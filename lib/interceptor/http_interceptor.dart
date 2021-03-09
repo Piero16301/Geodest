@@ -21,8 +21,12 @@ class AuthenticatedHttpClient extends http.BaseClient {
     if (request.url.toString().contains('refresh')) {
       return request.send();
     }
-    if (userAccessToken.isNotEmpty) {
+
+    String token = userAccessToken;
+
+    if (token.isNotEmpty) {
       request.headers.putIfAbsent('Authorization', () => 'Bearer $userAccessToken');
+      print("haha 401");
     }
     return request.send();
   }

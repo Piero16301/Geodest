@@ -35,14 +35,11 @@ class LocationService {
       }
     }
 
-    print("${CommonService.wsBaseUrl}/$username/");
+    print("WEBSOCKET: ${CommonService.wsBaseUrl}/$username/");
 
     channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
 
-
-
     /// lo de abajo es para debugging
-    // channel = IOWebSocketChannel.connect(Uri.parse("wss://echo.websocket.org"));
     channel.stream.listen((event) {
       print("WS response: $event");
     });
@@ -86,17 +83,19 @@ class LocationService {
     bool isMock;
   */
   static sendLocation(Location location) {
-    // channel.sink.add(
-    //   "${location.longitude}, ${location.latitude}"
-    // );
-    channel.sink.add(jsonEncode({
-      'message': "{\"lat\": ${location.latitude}, \"lng\": ${location.longitude}"
-    }));
+    channel.sink.add(
+      jsonEncode({
+        'message': jsonEncode({
+          'lat': location.latitude,
+          'lng': location.longitude
+        })
+      })
+    );
   }
 
   static stop() async {
     print("Dejando de compartir ubicación...");
-    // channel.sink.close();
+    channel.sink.close();
     BackgroundLocation.stopLocationService();
     // await StorageService.removeUsername();
     await StorageService.saveIsSharingLocation(false);

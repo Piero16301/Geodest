@@ -19,7 +19,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
   List<Delivery> deliveries = [];
 
   void obtainDeliveries() {
-    //FIXME: aveces da 401
+    //FIXME: aveces da 401 (porq expira el accessToken creo)
     ClientService.getDeliveries().then((res) {
       if (res.statusCode == 200) {
         List<dynamic> buff = jsonDecode(res.body) as List<dynamic>;

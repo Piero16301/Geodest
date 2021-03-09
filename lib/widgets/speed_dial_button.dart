@@ -7,9 +7,23 @@ import '../services/location_service.dart';
 import '../services/storage_service.dart';
 import '../services/client_service.dart';
 
+enum SpeedDialAction {
+  ShareLocation,
+  RefreshDeliveries,
+  AddDelivery
+}
+
+class SpeedDialButton extends StatefulWidget {
+  SpeedDialButton();
+
+  @override
+  _SpeedDialButtonState createState() => _SpeedDialButtonState();
+
+}
+
 //TODO: convertir a un staeful widget
 //TODO: darle un feedback al usuario para que se note que está compartiendo ubicación
-class SpeedDialButton extends StatelessWidget {
+class _SpeedDialButtonState extends State<SpeedDialButton> {
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +41,14 @@ class SpeedDialButton extends StatelessWidget {
       elevation: 5,
       shape: CircleBorder(),
       children: [
-        _dialChild(context: context, icon: Icons.location_on, color: Colors.red, label: "Compartir Ubicación", route: 'login'),
-        _dialChild(context: context, icon: Icons.update, color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
-        _dialChild(context: context, icon: Icons.add, color: Colors.green, label: "Añadir Envío", route: 'login'),
+        _dialChild(action: SpeedDialAction.ShareLocation, context: context, icon: Icons.location_on, color: Colors.red, label: "Compartir Ubicación", route: 'login'),
+        _dialChild(action: SpeedDialAction.RefreshDeliveries, context: context, icon: Icons.update, color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
+        _dialChild(action: SpeedDialAction.AddDelivery, context: context, icon: Icons.add, color: Colors.green, label: "Añadir Envío", route: 'login'),
       ],
     );
   }
 
-  SpeedDialChild _dialChild({context, icon, color, label, route}) {
+  SpeedDialChild _dialChild({action, context, icon, color, label, route}) {
     return SpeedDialChild(
       child: Icon(icon),
       backgroundColor: color,
@@ -49,14 +63,32 @@ class SpeedDialButton extends StatelessWidget {
         fontWeight: FontWeight.bold,
       ),
       onTap: () {
-        BackgroundLocation.getPermissions(
-          onGranted: () {
-            LocationService.toggleLocationSharing();
-          },
-          onDenied: () {
-            LocationService.complainPermissionDenied(context);
-          },
-        );
+        switch (action) {
+          case SpeedDialAction.RefreshDeliveries: {
+            //TODO: mandarle un evento a DeliveriesPage para q refresque
+            print("Refresh deliveries");
+            break;
+          }
+          case SpeedDialAction.ShareLocation: {
+            BackgroundLocation.getPermissions(
+              onGranted: () {
+                LocationService.toggleLocationSharing();
+              },
+              onDenied: () {
+                LocationService.complainPermissionDenied(context);
+              },
+            );
+            break;
+          }
+          case SpeedDialAction.AddDelivery: {
+            //TODO: pushear la vista de añadir delivery
+            print("Añadir delivery");
+            break;
+          }
+          default: {
+            // nica llega acá
+          }
+        }
       },
     );
   }

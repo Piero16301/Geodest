@@ -34,6 +34,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       } else {
         print(res.statusCode);
         print("[ERROR]: fetching deliveries");
+        //TODO: mostrar dialog indicando el error
       }
     });
   }
@@ -66,6 +67,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
               trailing: Icon(Icons.arrow_forward_ios),
               onTap: () {
                 //TODO: show pedido details
+                print("Show delivery details");
               },
             ),
           );

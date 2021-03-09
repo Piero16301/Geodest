@@ -55,7 +55,7 @@ class LocationService {
     BackgroundLocation.startLocationService();
   }
 
-  static toggleLocationSharing() async {
+  static Future<bool> toggleLocationSharing() async {
     bool isSharingLocation = await StorageService.getIsSharingLocation();
 
     if (!isSharingLocation) {
@@ -65,9 +65,10 @@ class LocationService {
         print("Location update at ${DateTime.now()}: (lat: ${location.latitude}, long: ${location.longitude})");
         sendLocation(location);
       });
-
+      return true;
     } else {
       await LocationService.stop();
+      return false;
     }
   }
 

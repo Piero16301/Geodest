@@ -14,7 +14,7 @@ class Delivery {
       latitude = json['latitude'],
       longitude = json['longitude'],
       receiver = json['receiver'],
-      phone = json['json'],
+      phone = json['phone'],
       token = json['token'],
       pk = json['pk'];
 

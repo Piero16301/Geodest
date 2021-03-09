@@ -26,7 +26,6 @@ class AuthenticatedHttpClient extends http.BaseClient {
 
     if (token.isNotEmpty) {
       request.headers.putIfAbsent('Authorization', () => 'Bearer $userAccessToken');
-      print("haha 401");
     }
     return request.send();
   }

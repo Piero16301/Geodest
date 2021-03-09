@@ -7,6 +7,7 @@ import 'package:geodest/models/user.dart';
 import 'package:geodest/services/storage_service.dart';
 import 'package:geodest/utils/colors.dart';
 import '../services/client_service.dart';
+import '../services/loader_service.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -69,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           onPressed: () {
 
-                            setIsLoading(waiting: true, context: context);
+                            LoaderService.setIsLoading(message: "Iniciando sesión...", waiting: true, context: context);
 
                             ///lo de abajo es para debuggear
                             // Future.delayed(Duration(seconds: 5)).then((_) {
@@ -87,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                                 //TODO: save Access and Refresh token
                                 StorageService.saveAccessToken(body['access']).then((_) {
                                   StorageService.saveRefreshToken(body['refresh']).then((_) {
-                                    setIsLoading(waiting: false, context: context);
+                                    LoaderService.setIsLoading(waiting: false);
                                     Navigator.pushNamed(context, 'deliveries');
                                   });
                                 });
@@ -153,24 +154,6 @@ class _LoginPageState extends State<LoginPage> {
         showTitle: true,
       ),
     );
-  }
-
-  void setIsLoading({bool waiting, BuildContext context}) {
-    if (waiting) {
-      showDialog(
-          context: context,
-          builder: (_) {
-            return AlertDialog(
-              title: const Text('Iniciando sesión...'),
-              content: const CircularProgressIndicator(),
-              elevation: 30.0,
-            );
-          },
-          barrierDismissible: true, //FIXME: cambiar a false
-      );
-    } else {
-      Navigator.of(context).pop();
-    }
   }
 
   Widget _textInput({controller, hint, icon}) {

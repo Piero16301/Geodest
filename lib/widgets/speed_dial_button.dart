@@ -25,6 +25,31 @@ class SpeedDialButton extends StatefulWidget {
 //TODO: darle un feedback al usuario para que se note que está compartiendo ubicación
 class _SpeedDialButtonState extends State<SpeedDialButton> {
 
+  Icon shareLocationIcon;
+  Color shareLocationColor;
+  String shareLocationText;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    StorageService.getIsSharingLocation().then((isSharing) {
+      if (isSharing) {
+        shareLocationIcon = Icon(Icons.location_off);
+        shareLocationColor = Colors.red;
+        shareLocationText = "Dejar de compartir";
+        setState(() {});
+      } else {
+        shareLocationIcon = Icon(Icons.location_on);
+        shareLocationColor = Colors.amber;
+        shareLocationText = "Compartir ubicación";
+        setState(() {});
+      }
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return SpeedDial(
@@ -41,16 +66,16 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       elevation: 5,
       shape: CircleBorder(),
       children: [
-        _dialChild(action: SpeedDialAction.ShareLocation, context: context, icon: Icons.location_on, color: Colors.red, label: "Compartir Ubicación", route: 'login'),
-        _dialChild(action: SpeedDialAction.RefreshDeliveries, context: context, icon: Icons.update, color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
-        _dialChild(action: SpeedDialAction.AddDelivery, context: context, icon: Icons.add, color: Colors.green, label: "Añadir Envío", route: 'login'),
+        _dialChild(action: SpeedDialAction.ShareLocation, context: context, icon: shareLocationIcon, color: shareLocationColor, label: shareLocationText, route: 'login'),
+        _dialChild(action: SpeedDialAction.RefreshDeliveries, context: context, icon: Icon(Icons.update), color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
+        _dialChild(action: SpeedDialAction.AddDelivery, context: context, icon: Icon(Icons.add), color: Colors.green, label: "Añadir Envío", route: 'login'),
       ],
     );
   }
 
   SpeedDialChild _dialChild({action, context, icon, color, label, route}) {
     return SpeedDialChild(
-      child: Icon(icon),
+      child: icon,
       backgroundColor: color,
       foregroundColor: Colors.white,
       //labelBackgroundColor: Color(0xffF9D342),
@@ -67,12 +92,31 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
           case SpeedDialAction.RefreshDeliveries: {
             //TODO: mandarle un evento a DeliveriesPage para q refresque
             print("Refresh deliveries");
+
+
+
             break;
           }
           case SpeedDialAction.ShareLocation: {
             BackgroundLocation.getPermissions(
               onGranted: () {
-                LocationService.toggleLocationSharing();
+                LocationService.toggleLocationSharing().then((result) {
+                  if (result) {
+                    /// empezó a compartir ubicación
+                    setState(() {
+                      shareLocationIcon = Icon(Icons.location_off);
+                      shareLocationColor = Colors.red;
+                      shareLocationText = "Dejar de compartir";
+                    });
+                  } else {
+                    /// dejó de compartir ubicación
+                    setState(() {
+                      shareLocationIcon = Icon(Icons.location_on);
+                      shareLocationColor = Colors.amber;
+                      shareLocationText = "Compartir ubicación";
+                    });
+                  }
+                });
               },
               onDenied: () {
                 LocationService.complainPermissionDenied(context);

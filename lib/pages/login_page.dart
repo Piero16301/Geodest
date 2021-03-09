@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:geodest/models/user.dart';
 import 'package:geodest/services/storage_service.dart';
 import 'package:geodest/utils/colors.dart';
@@ -127,8 +128,8 @@ class _LoginPageState extends State<LoginPage> {
                               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
                             ),
                             onPressed: () {
-                              //TODO: abrir redirigir al link de register
-                              Navigator.pushNamed(context, 'register');
+                              //Navigator.pushNamed(context, 'register');
+                              openRegisterTab();
                             },
                           ),
                         ),
@@ -144,6 +145,16 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  openRegisterTab() async {
+    await FlutterWebBrowser.openWebPage(
+      url: "https://geosend.herokuapp.com/accounts/signup/",
+      customTabsOptions: CustomTabsOptions(
+        toolbarColor: primaryColor,
+        showTitle: true,
+      ),
+    );
+  }
+
   void setIsLoading({bool waiting, BuildContext context}) {
     if (waiting) {
       showDialog(
@@ -153,7 +164,6 @@ class _LoginPageState extends State<LoginPage> {
               title: const Text('Iniciando sesión...'),
               content: const CircularProgressIndicator(),
               elevation: 30.0,
-
             );
           },
           barrierDismissible: true, //FIXME: cambiar a false

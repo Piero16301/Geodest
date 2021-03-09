@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geodest/utils/colors.dart';
 import 'dart:async';
 
 class SplashPage extends StatefulWidget {
@@ -12,6 +11,7 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     Timer(const Duration(milliseconds: 3000), () {
+      //TODO: check if you have already logged in before on the device (redirect to login or deliveries)
       Navigator.pushNamed(context, 'login');
     });
   }

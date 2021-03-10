@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:geodest/providers/ui_provider.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:background_location/background_location.dart';
+import 'package:provider/provider.dart';
 
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
-import '../services/client_service.dart';
 
 enum SpeedDialAction {
   ShareLocation,
@@ -52,6 +53,7 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
 
   @override
   Widget build(BuildContext context) {
+
     return SpeedDial(
       marginEnd: 20,
       marginBottom: 20,
@@ -74,6 +76,10 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
   }
 
   SpeedDialChild _dialChild({action, context, icon, color, label, route}) {
+
+    final uiProvider = Provider.of<UiProvider>(context);
+    final currentIndex = uiProvider.selectedMenuOpt;
+
     return SpeedDialChild(
       child: icon,
       backgroundColor: color,
@@ -93,7 +99,9 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             //TODO: mandarle un evento a DeliveriesPage para q refresque
             print("Refresh deliveries");
 
-
+            if (currentIndex == 0) {
+              uiProvider.selectedMenuOpt = 1;
+            }
 
             break;
           }

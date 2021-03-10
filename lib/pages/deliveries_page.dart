@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:geodest/models/delivery.dart';
+import 'package:geodest/providers/ui_provider.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:geodest/widgets/speed_dial_button.dart';
+import 'package:provider/provider.dart';
 
 class DeliveriesPage extends StatefulWidget {
 
@@ -50,6 +52,17 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    final uiProvider = Provider.of<UiProvider>(context);
+    final currentIndex = uiProvider.selectedMenuOpt;
+
+    //TODO: no se puede poner un set state con el UiProvider
+    /*if (currentIndex == 1) {
+      obtainDeliveries();
+      uiProvider.selectedMenuOpt = 0;
+      print("Updating deliveries");
+    }*/
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

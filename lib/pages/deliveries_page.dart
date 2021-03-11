@@ -94,7 +94,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
           } else if (snapshot.hasError) {
             return const Padding(
               padding: EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0),
-              child: Text("Ocurrió un error. Refresca los deliveries."),
+              child: Text("Ocurrió un error. Refresca los deliveries nuevamente."),
             );
           } else {
             return const Padding(

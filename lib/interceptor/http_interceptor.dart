@@ -1,44 +1,66 @@
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
-class AuthenticatedHttpClient extends http.BaseClient {
-  SharedPreferences sharedPref;
-  AuthenticatedHttpClient({this.sharedPref});
+import 'package:http_interceptor/http_interceptor.dart';
 
-  String cachedAccessToken = '';
+import 'package:http/http.dart' as http show Response;
 
-  String get userAccessToken {
-    if (cachedAccessToken.isNotEmpty)
-      return cachedAccessToken;
-    else
-      cachedAccessToken = loadAccessToken();
-    return cachedAccessToken;
-  }
+import '../services/storage_service.dart';
+import '../services/client_service.dart';
 
+class GeodestInterceptor implements InterceptorContract {
+
+  /// REQUEST
   @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    // si es un request para refrescar el token, no necesita header alguno
-    if (request.url.toString().contains('refresh')) {
-      return request.send();
+  Future<RequestData> interceptRequest({RequestData data}) async {
+    print("Request intercepted, data: ${data.toString()}");
+
+    if (data.url.toString().contains("refresh")) {
+      data.headers["Content-Type"] = "application/json";
+      return data;
     }
 
-    String token = userAccessToken;
+    String accessToken = await StorageService.getAccessToken();
 
-    if (token.isNotEmpty) {
-      request.headers.putIfAbsent('Authorization', () => 'Bearer $userAccessToken');
+    data.headers["Content-Type"] = "application/json";
+    data.headers["Authorization"] = "Bearer $accessToken";
+
+    return data;
+  }
+
+  /// RESPONSE
+  @override
+  Future<ResponseData> interceptResponse({ResponseData data}) async {
+
+    /// sin este if, se hace un loop recursivo, Lmao
+    if (data.url.toString().contains("refresh")) {
+      return data;
     }
-    return request.send();
+
+    print("Response intercepted, data: ${data.toString()}");
+
+    if (data.statusCode == 401) {
+      print("Refreshing token...");
+
+      http.Response res = await ClientService.refreshToken();
+
+      print(res.body);
+
+      Map body = jsonDecode(res.body);
+
+      if (body["access"] != null) {
+        await StorageService.saveAccessToken(body["access"]);
+      } else {
+        print("REFRESHED TOKEN BUT GOT NO NEW ACCESS TOKEN");
+        /// creo q en este caso, tenemos que desloguear al usuario
+      }
+
+      //TODO: retornar un statusCode especial para reintentar el request
+
+    } else {
+      print("Normal response");
+    }
+
+    return data;
   }
 
-  //TODO: interceptar responses si es necesario
-
-  String loadAccessToken() {
-    final accessToken = sharedPref.getString('accessToken');
-    return accessToken ?? '';
-  }
-
-  /// LLAMAR ESTA FUNCION CUANDO EL USUARIO HAGA LOGOUT
-  void reset() {
-    cachedAccessToken = '';
-  }
 }

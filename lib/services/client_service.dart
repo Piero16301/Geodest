@@ -1,10 +1,9 @@
 import 'package:geodest/services/storage_service.dart';
 import 'package:http_interceptor/http_client_with_interceptor.dart';
 import 'package:http/http.dart' as http show Response;
-
-import '../interceptor/http_interceptor.dart';
-import '../services/common_service.dart';
 import 'dart:convert';
+import '../interceptor/http_interceptor.dart';
+import './common_service.dart';
 
 class ClientService {
 
@@ -70,8 +69,6 @@ class ClientService {
         })
     );
   }
-
-
 
   /// username
   static Future<http.Response> getUsername() async {

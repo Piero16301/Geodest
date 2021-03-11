@@ -38,6 +38,7 @@ dependencies:
   web_socket_channel: ^2.0.0
   flutter_web_browser: ^0.13.1
   provider: ^5.0.0
+  eventify: ^0.1.4
 
 dev_dependencies:
   flutter_test:

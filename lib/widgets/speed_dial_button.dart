@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:geodest/providers/ui_provider.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:background_location/background_location.dart';
-import 'package:provider/provider.dart';
 
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
+import '../services/events_service.dart';
 
-enum SpeedDialAction {
-  ShareLocation,
-  RefreshDeliveries,
-  AddDelivery
-}
+import '../enums/speed_dial_action.dart';
 
 class SpeedDialButton extends StatefulWidget {
   SpeedDialButton();
@@ -71,14 +66,15 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
         _dialChild(action: SpeedDialAction.ShareLocation, context: context, icon: shareLocationIcon, color: shareLocationColor, label: shareLocationText, route: 'login'),
         _dialChild(action: SpeedDialAction.RefreshDeliveries, context: context, icon: Icon(Icons.update), color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
         _dialChild(action: SpeedDialAction.AddDelivery, context: context, icon: Icon(Icons.add), color: Colors.green, label: "Añadir Envío", route: 'login'),
+        _dialChild(action: SpeedDialAction.Logout, context: context, icon: Icon(Icons.logout), color: Colors.deepPurpleAccent, label: "Logout", route: 'login'),
       ],
     );
   }
 
   SpeedDialChild _dialChild({action, context, icon, color, label, route}) {
 
-    final uiProvider = Provider.of<UiProvider>(context);
-    final currentIndex = uiProvider.selectedMenuOpt;
+    // final uiProvider = Provider.of<UiProvider>(context);
+    // final currentIndex = uiProvider.selectedMenuOpt;
 
     return SpeedDialChild(
       child: icon,
@@ -99,7 +95,8 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             //TODO: mandarle un evento a DeliveriesPage para q refresque
             print("Refresh deliveries");
 
-            uiProvider.selectedMenuOpt = 1;
+            // uiProvider.selectedMenuOpt = 1;
+            EventsService.emitter.emit("refreshDeliveries");
 
             break;
           }
@@ -133,6 +130,13 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
           case SpeedDialAction.AddDelivery: {
             //TODO: pushear la vista de añadir delivery
             print("Añadir delivery");
+            break;
+          }
+          case SpeedDialAction.Logout: {
+            StorageService.logout().then((_) {
+              Navigator.of(context).pushReplacementNamed('login');
+            });
+            print("logout");
             break;
           }
           default: {

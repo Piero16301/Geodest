@@ -31,6 +31,7 @@ class ClientService {
   /// deliveries
 
   static Future<http.Response> postDelivery(Map<String, dynamic> body) async {
+    client = AuthenticatedHttpClient(sharedPref: await SharedPreferences.getInstance());
     return await client.post(
         Uri.parse(CommonService.deliveryUrl),
         body: jsonEncode(body),
@@ -41,6 +42,9 @@ class ClientService {
   }
 
   static Future<http.Response> getDeliveries() async {
+    print("getting deliveries");
+    client = AuthenticatedHttpClient(sharedPref: await SharedPreferences.getInstance());
+    print("got client instance");
     return await client.get(
         Uri.parse(CommonService.deliveryUrl),
         headers: <String, String> {
@@ -50,6 +54,7 @@ class ClientService {
   }
 
   static Future<http.Response> completeDelivery(int id) async {
+    client = AuthenticatedHttpClient(sharedPref: await SharedPreferences.getInstance());
     return await client.put(
         Uri.parse("${CommonService.deliveryUrl}/$id"),
         headers: <String, String> {
@@ -78,6 +83,7 @@ class ClientService {
 
   /// username
   static Future<http.Response> getUsername() async {
+    client = AuthenticatedHttpClient(sharedPref: await SharedPreferences.getInstance());
     return await client.get(
       Uri.parse(CommonService.usernameUrl),
       headers: <String, String> {

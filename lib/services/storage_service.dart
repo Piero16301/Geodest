@@ -87,4 +87,14 @@ class StorageService {
     await prefs.remove('username');
   }
 
+  /// logout
+  static Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await removeAccessToken();
+    await removeRefreshToken();
+    await removeIsSharingLocation();
+    await removeIsSharingLocation();
+    /// asumo que no esta compartiendo ubicacion cuando hace logout
+  }
+
 }

@@ -63,10 +63,10 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       elevation: 5,
       shape: CircleBorder(),
       children: [
+        _dialChild(action: SpeedDialAction.Logout, context: context, icon: Icon(Icons.logout), color: Colors.deepPurpleAccent, label: "Logout", route: 'login'),
         _dialChild(action: SpeedDialAction.ShareLocation, context: context, icon: shareLocationIcon, color: shareLocationColor, label: shareLocationText, route: 'login'),
         _dialChild(action: SpeedDialAction.RefreshDeliveries, context: context, icon: Icon(Icons.update), color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
         _dialChild(action: SpeedDialAction.AddDelivery, context: context, icon: Icon(Icons.add), color: Colors.green, label: "Añadir Envío", route: 'login'),
-        _dialChild(action: SpeedDialAction.Logout, context: context, icon: Icon(Icons.logout), color: Colors.deepPurpleAccent, label: "Logout", route: 'login'),
       ],
     );
   }

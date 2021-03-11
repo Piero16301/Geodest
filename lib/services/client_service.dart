@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:geodest/models/delivery.dart';
-
 import '../interceptor/http_interceptor.dart';
 import './storage_service.dart';
 import 'package:http/http.dart' as http;

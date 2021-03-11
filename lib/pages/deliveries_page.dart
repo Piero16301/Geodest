@@ -2,11 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:geodest/models/delivery.dart';
-import 'package:geodest/providers/ui_provider.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:geodest/widgets/speed_dial_button.dart';
-import 'package:provider/provider.dart';
 
 import '../services/events_service.dart';
 

@@ -99,9 +99,7 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             //TODO: mandarle un evento a DeliveriesPage para q refresque
             print("Refresh deliveries");
 
-            if (currentIndex == 0) {
-              uiProvider.selectedMenuOpt = 1;
-            }
+            uiProvider.selectedMenuOpt = 1;
 
             break;
           }

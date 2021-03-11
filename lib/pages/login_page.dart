@@ -89,7 +89,9 @@ class _LoginPageState extends State<LoginPage> {
                                 StorageService.saveAccessToken(body['access']).then((_) {
                                   StorageService.saveRefreshToken(body['refresh']).then((_) {
                                     LoaderService.setIsLoading(waiting: false);
-                                    Navigator.pushNamed(context, 'deliveries');
+                                    ///pushNamedAndRemoveUntil para borrar el navigator stack y no poder volver
+                                    ///a la vista del login
+                                    Navigator.pushNamedAndRemoveUntil(context, 'deliveries', (_) => false);
                                   });
                                 });
                               } else {

@@ -29,9 +29,11 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         buff.forEach((post) {
           parsedDeliveries.add(Delivery.fromJson(post as Map<String, dynamic>));
         });
+        /*print("Deliveries: $parsedDeliveries");
+        return parsedDeliveries;*/
         setState(() {
           deliveries = parsedDeliveries;
-          print("deliveries: $deliveries");
+          print("Deliveries: $deliveries");
         });
       } else {
         print(res.statusCode);
@@ -56,18 +58,21 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
     final uiProvider = Provider.of<UiProvider>(context);
     final currentIndex = uiProvider.selectedMenuOpt;
 
-    //TODO: no se puede poner un set state con el UiProvider
-    /*if (currentIndex == 1) {
+    //TODO: sale error en cuando se hace un setState dentro de la función build()
+    if (currentIndex == 1) {
+      print("Current index: $currentIndex");
       obtainDeliveries();
       uiProvider.selectedMenuOpt = 0;
-      print("Updating deliveries");
-    }*/
+      print("Current index: $currentIndex");
+      print("Updating deliveries: $deliveries");
+    }
 
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text("Deliveries"),
         backgroundColor: primaryColor,
+        automaticallyImplyLeading: false,
       ),
       body: ListView.builder(
         itemCount: deliveries.length,

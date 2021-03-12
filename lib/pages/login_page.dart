@@ -103,6 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                                         });
                                       } else {
                                         //TODO: dialog diciendo que las credenciales son incorrectas
+                                        Navigator.of(context).pop();
                                         _mostrarAlert(context);
                                       }
                                     });
@@ -173,6 +174,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _textEmailInput({controller, hint, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
+      height: 60,
       child: TextFormField(
         controller: controller,
         validator: (value) {
@@ -197,6 +199,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _textPasswordInput({controller, hint, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
+      height: 60,
       child: TextFormField(
         controller: controller,
         validator: (value) {

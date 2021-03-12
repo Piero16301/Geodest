@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +20,8 @@ class _LoginPageState extends State<LoginPage> {
 
   ///Validación del form
   final _formKey = GlobalKey<FormState>();
+
+  bool _isHidden = true;
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +54,8 @@ class _LoginPageState extends State<LoginPage> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          _textInput(hint: "Ingrese su correo electrónico", label: "Correo electrónico", icon: Icons.email, controller: emailController, obscure: false),
-                          _textInput(hint: "Ingrese su contraseña", label: "Contraseña", icon: Icons.vpn_key, controller: passwordController, obscure: true),
+                          _textEmailInput(hint: "Ingrese su correo electrónico", label: "Correo electrónico", icon: Icons.email, controller: emailController),
+                          _textPasswordInput(hint: "Ingrese su contraseña", label: "Contraseña", icon: Icons.vpn_key, controller: passwordController),
                           Container(height: 50),
                           Center(
                             child: SizedBox(
@@ -64,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text(
                                   "INICIAR SESIÓN",
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 15,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -102,6 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                                         });
                                       } else {
                                         //TODO: dialog diciendo que las credenciales son incorrectas
+                                        _mostrarAlert(context);
                                       }
                                     });
                                   }
@@ -126,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Text(
                                     "REGISTRARSE",
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 15,
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -168,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _textInput({controller, hint, label, icon, obscure}) {
+  Widget _textEmailInput({controller, hint, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
       child: TextFormField(
@@ -180,7 +182,6 @@ class _LoginPageState extends State<LoginPage> {
           }
           return null;
         },
-        obscureText: obscure,
         decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20.0),
@@ -189,6 +190,68 @@ class _LoginPageState extends State<LoginPage> {
           icon: Icon(icon),
         ),
       ),
+    );
+  }
+
+
+  Widget _textPasswordInput({controller, hint, label, icon}) {
+    return Container(
+      margin: EdgeInsets.only(top: 30),
+      child: TextFormField(
+        controller: controller,
+        validator: (value) {
+          if (value.isEmpty) {
+            String tempLabel = label.toString().toLowerCase();
+            return 'Por favor, ingrese su $tempLabel';
+          }
+          return null;
+        },
+        obscureText: _isHidden,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          labelText: label,
+          icon: Icon(icon),
+          suffix: InkWell(
+            onTap: _togglePasswordView,
+            child: Icon(
+              _isHidden ? Icons.visibility : Icons.visibility_off,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _togglePasswordView() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
+  }
+
+  void _mostrarAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          title: Text('Credenciales incorrectas'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text('Verifica tu correo electrónico y contraseña e inténtalo nuevamente'),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Ok'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      }
     );
   }
 

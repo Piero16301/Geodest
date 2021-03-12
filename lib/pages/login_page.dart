@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,8 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  //TODO: validación del form
+  ///Validación del form
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -47,96 +49,104 @@ class _LoginPageState extends State<LoginPage> {
                 child: ListView(
                   //mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
-                    _textInput(hint: "Correo Electrónico", icon: Icons.email, controller: emailController),
-                    _textInput(hint: "Contraseña", icon: Icons.vpn_key, controller: passwordController),
-                    Container(height: 50),
-                    Center(
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 40,
-                        child: ElevatedButton(
-                          child: Text(
-                            "INICIAR SESIÓN",
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            primary: primaryColor,
-                            onPrimary: Colors.white,
-                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
-                          ),
-                          onPressed: () {
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          _textInput(hint: "Ingrese su correo electrónico", label: "Correo electrónico", icon: Icons.email, controller: emailController, obscure: false),
+                          _textInput(hint: "Ingrese su contraseña", label: "Contraseña", icon: Icons.vpn_key, controller: passwordController, obscure: true),
+                          Container(height: 50),
+                          Center(
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 40,
+                              child: ElevatedButton(
+                                child: Text(
+                                  "INICIAR SESIÓN",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  primary: primaryColor,
+                                  onPrimary: Colors.white,
+                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
+                                ),
+                                onPressed: () {
+                                  if (_formKey.currentState.validate()) {
+                                    LoaderService.setIsLoading(message: "Iniciando sesión...", waiting: true, context: context);
 
-                            LoaderService.setIsLoading(message: "Iniciando sesión...", waiting: true, context: context);
+                                    ///lo de abajo es para debuggear
+                                    // Future.delayed(Duration(seconds: 5)).then((_) {
+                                    //   setIsLoading(waiting: false, context: context);
+                                    // });
 
-                            ///lo de abajo es para debuggear
-                            // Future.delayed(Duration(seconds: 5)).then((_) {
-                            //   setIsLoading(waiting: false, context: context);
-                            // });
+                                    User user = User(email: emailController.text, password: passwordController.text);
 
-                            User user = User(email: emailController.text, password: passwordController.text);
-
-                            ClientService.login(
-                              user.toJson()
-                            ).then((res) {
-                              if (res.statusCode == 200) {
-                                final body = jsonDecode(res.body);
-                                print("body del login: $body");
-                                //TODO: save Access and Refresh token
-                                StorageService.saveAccessToken(body['access']).then((_) {
-                                  StorageService.saveRefreshToken(body['refresh']).then((_) {
-                                    LoaderService.setIsLoading(waiting: false);
-                                    ///pushNamedAndRemoveUntil para borrar el navigator stack y no poder volver
-                                    ///a la vista del login
-                                    Navigator.pushNamedAndRemoveUntil(context, 'deliveries', (_) => false);
-                                  });
-                                });
-                              } else {
-                                //TODO: dialog diciendo que las credenciales son incorrectas
-                              }
-                            });
-
-                          },
-                        ),
-                      ),
-                    ),
-                    Container(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "¿Aún no tienes cuenta?",
-                          style: TextStyle(
-                            fontSize: 15,
-                          ),
-                        ),
-                        SizedBox(
-                          //width: MediaQuery.of(context).size.width,
-                          height: 40,
-                          child: ElevatedButton(
-                            child: Text(
-                              "REGISTRARSE",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                    ClientService.login(
+                                        user.toJson()
+                                    ).then((res) {
+                                      if (res.statusCode == 200) {
+                                        final body = jsonDecode(res.body);
+                                        print("body del login: $body");
+                                        //TODO: save Access and Refresh token
+                                        StorageService.saveAccessToken(body['access']).then((_) {
+                                          StorageService.saveRefreshToken(body['refresh']).then((_) {
+                                            LoaderService.setIsLoading(waiting: false);
+                                            ///pushNamedAndRemoveUntil para borrar el navigator stack y no poder volver
+                                            ///a la vista del login
+                                            Navigator.pushNamedAndRemoveUntil(context, 'deliveries', (_) => false);
+                                          });
+                                        });
+                                      } else {
+                                        //TODO: dialog diciendo que las credenciales son incorrectas
+                                      }
+                                    });
+                                  }
+                                },
                               ),
                             ),
-                            style: ElevatedButton.styleFrom(
-                              primary: primaryColor,
-                              onPrimary: Colors.white,
-                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
-                            ),
-                            onPressed: () {
-                              //Navigator.pushNamed(context, 'register');
-                              openRegisterTab();
-                            },
                           ),
-                        ),
-                      ],
+                          Container(height: 50),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                "¿Aún no tienes cuenta?",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                              SizedBox(
+                                //width: MediaQuery.of(context).size.width,
+                                height: 40,
+                                child: ElevatedButton(
+                                  child: Text(
+                                    "REGISTRARSE",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: primaryColor,
+                                    onPrimary: Colors.white,
+                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
+                                  ),
+                                  onPressed: () {
+                                    //Navigator.pushNamed(context, 'register');
+                                    openRegisterTab();
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(height: 50),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -158,20 +168,25 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _textInput({controller, hint, icon}) {
+  Widget _textInput({controller, hint, label, icon, obscure}) {
     return Container(
-      margin: EdgeInsets.only(top: 40),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.only(left: 10),
+      margin: EdgeInsets.only(top: 30),
       child: TextFormField(
         controller: controller,
+        validator: (value) {
+          if (value.isEmpty) {
+            String tempLabel = label.toString().toLowerCase();
+            return 'Por favor, ingrese su $tempLabel';
+          }
+          return null;
+        },
+        obscureText: obscure,
         decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: hint,
-          prefixIcon: Icon(icon),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          labelText: label,
+          icon: Icon(icon),
         ),
       ),
     );

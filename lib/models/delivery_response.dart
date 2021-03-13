@@ -1,5 +1,5 @@
-class Delivery {
-  Delivery({this.address, this.latitude, this.longitude, this.receiver, this.phone, this.token, this.pk});
+class DeliveryResponse {
+  DeliveryResponse({this.address, this.latitude, this.longitude, this.receiver, this.phone, this.token, this.pk});
 
   final String address;
   final String latitude;
@@ -9,7 +9,7 @@ class Delivery {
   final String token;
   final int pk;
 
-  Delivery.fromJson(Map<String, dynamic> json):
+  DeliveryResponse.fromJson(Map<String, dynamic> json):
       address = json['address'],
       latitude = json['latitude'],
       longitude = json['longitude'],

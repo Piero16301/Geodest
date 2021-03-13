@@ -1,6 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:geodest/models/delivery_request.dart';
 
+import 'package:geodest/services/client_service.dart';
+import 'package:geodest/services/events_service.dart';
+import 'package:geodest/services/loader_service.dart';
 import 'package:geodest/utils/colors.dart';
 
 class NewDeliveryPage extends StatefulWidget {
@@ -38,7 +43,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
                   _addressInput(controller: addressController, label: "Dirección del comprador", icon: Icons.home),
                   _textInput(controller: clientController, label: "Nombre del comprador", icon: Icons.person),
                   _textInput(controller: phoneController, label: "Celular del comprador", icon: Icons.phone_android),
-                  _newDeliveryButton(),
+                  _createNewDelivery(),
                 ],
               ),
             ),
@@ -69,7 +74,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
         validator: (value) {
           if (value.isEmpty) {
             String tempLabel = label.toString().toLowerCase();
-            return 'Por favor, ingrese su $tempLabel';
+            return 'Por favor, ingrese la $tempLabel';
           }
           return null;
         },
@@ -88,8 +93,8 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
                   finalAddress = result;
                 });
               } else {
-                //TODO: mostrar alert que no existe la dirección
-
+                ///mostrar alert que no existe la dirección
+                _mostrarAlert(context: context, title: 'Dirección incorrecta', content: 'La dirección ingresada no ha sido encontrada, verifica los datos');
               }
             },
             child: Icon(Icons.search),
@@ -108,7 +113,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
         validator: (value) {
           if (value.isEmpty) {
             String tempLabel = label.toString().toLowerCase();
-            return 'Por favor, ingrese su $tempLabel';
+            return 'Por favor, ingrese el $tempLabel';
           }
           return null;
         },
@@ -123,7 +128,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
     );
   }
 
-  Widget _newDeliveryButton() {
+  Widget _createNewDelivery() {
     return Container(
       margin: EdgeInsets.only(top: 50),
       child: SizedBox(
@@ -144,10 +149,53 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
           ),
           onPressed: () {
-
+            if (_formKey.currentState.validate()) {
+              LoaderService.setIsLoading(message: "Guardando pedido...", waiting: true, context: context);
+              DeliveryRequest delivery = DeliveryRequest(address: addressController.text, latitude: finalAddress.coordinates.latitude, longitude: finalAddress.coordinates.longitude, receiver: clientController.text, phone: int.parse(phoneController.text));
+              print("Delivery: ${delivery.toJson()}");
+              ClientService.postDelivery(
+                delivery.toJson()
+              ).then((res) {
+                print('Code: ${res.statusCode} Body: ${res.body}');
+                if (res.statusCode == 200) {
+                  final body = jsonDecode(res.body);
+                  print("Body del nuevo pedido: $body");
+                  EventsService.emitter.emit("refreshDeliveries");
+                  Navigator.pushNamedAndRemoveUntil(context, 'deliveries', (_) => false);
+                } else {
+                  Navigator.of(context).pop();
+                  _mostrarAlert(context: context, title: 'No se pudo guardar el pedido', content: 'Verifica todos los campos e inténtalo nuevamente');
+                }
+              });
+            }
           },
         ),
       ),
+    );
+  }
+
+  void _mostrarAlert({context, title, content}) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(content),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Ok'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        }
     );
   }
 

@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ).then((res) {
                                       if (res.statusCode == 200) {
                                         final body = jsonDecode(res.body);
-                                        print("body del login: $body");
+                                        print("Body del login: $body");
                                         //TODO: save Access and Refresh token
                                         StorageService.saveAccessToken(body['access']).then((_) {
                                           StorageService.saveRefreshToken(body['refresh']).then((_) {
@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                                           });
                                         });
                                       } else {
-                                        //TODO: dialog diciendo que las credenciales son incorrectas
+                                        ///dialog diciendo que las credenciales son incorrectas
                                         Navigator.of(context).pop();
                                         _mostrarAlert(context);
                                       }

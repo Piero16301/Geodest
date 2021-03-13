@@ -22,6 +22,7 @@ class GeodestInterceptor implements InterceptorContract {
 
     data.headers["Content-Type"] = "application/json";
     data.headers["Authorization"] = "Bearer $accessToken";
+    print("Authorization: ${data.headers["Authorization"]}");
 
     return data;
   }

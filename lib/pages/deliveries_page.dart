@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-import 'package:geodest/models/delivery.dart';
+import 'package:geodest/models/delivery_response.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:geodest/widgets/speed_dial_button.dart';
@@ -19,15 +19,15 @@ class DeliveriesPage extends StatefulWidget {
 
 class _DeliveriesPageState extends State<DeliveriesPage> {
 
-  Future<List<Delivery>> obtainDeliveries() async {
+  Future<List<DeliveryResponse>> obtainDeliveries() async {
     //FIXME: aveces da 401 (porq expira el accessToken creo)
     var res = await ClientService.getDeliveries();
 
     if (res.statusCode == 200) {
       List<dynamic> buff = jsonDecode(res.body) as List<dynamic>;
-      List<Delivery> parsedDeliveries = [];
+      List<DeliveryResponse> parsedDeliveries = [];
       buff.forEach((post) {
-        parsedDeliveries.add(Delivery.fromJson(post as Map<String, dynamic>));
+        parsedDeliveries.add(DeliveryResponse.fromJson(post as Map<String, dynamic>));
       });
       print("Deliveries: $parsedDeliveries");
       return parsedDeliveries;
@@ -71,7 +71,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       ),
       body: FutureBuilder(
         future: obtainDeliveries(),
-        builder: (BuildContext ctx, AsyncSnapshot<List<Delivery>> snapshot) {
+        builder: (BuildContext ctx, AsyncSnapshot<List<DeliveryResponse>> snapshot) {
           if (snapshot.hasData) {
             return ListView.builder(
               itemCount: snapshot.data.length,

@@ -1,9 +1,5 @@
-// import 'dart:async';
-
 import 'package:flutter/material.dart';
-/*import 'package:google_api_headers/google_api_headers.dart';
-import 'package:google_maps_webservice/places.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';*/
+import 'package:geocoder/geocoder.dart';
 
 import 'package:geodest/utils/colors.dart';
 
@@ -17,10 +13,10 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   final clientController = TextEditingController();
   final phoneController = TextEditingController();
 
+  Address finalAddress = Address();
+
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  //final _apiKey = "AIzaSyBVwLl1VyKZ5G5gnZOpk78JX2udK8VpvXE";
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +38,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
                   _addressInput(controller: addressController, label: "Dirección del comprador", icon: Icons.home),
                   _textInput(controller: clientController, label: "Nombre del comprador", icon: Icons.person),
                   _textInput(controller: phoneController, label: "Celular del comprador", icon: Icons.phone_android),
+                  _newDeliveryButton(),
                 ],
               ),
             ),
@@ -49,6 +46,18 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
         ),
       ),
     );
+  }
+
+  Future<Address> searchAddress() async {
+    try {
+      List<Address> results = await Geocoder.local.findAddressesFromQuery(addressController.text);
+      Address bestResult = results.first;
+      print("Result: ${bestResult.toMap()}");
+      return bestResult;
+    } catch(e) {
+      print("Error occured: $e");
+      return null;
+    }
   }
 
   Widget _addressInput({controller, label, icon}) {
@@ -70,44 +79,25 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           ),
           labelText: label,
           icon: Icon(icon),
+          suffix: InkWell(
+            onTap: () async {
+              Address result = await searchAddress();
+              if (result != null) {
+                setState(() {
+                  addressController.text = result.addressLine;
+                  finalAddress = result;
+                });
+              } else {
+                //TODO: mostrar alert que no existe la dirección
+
+              }
+            },
+            child: Icon(Icons.search),
+          ),
         ),
-        onTap: () /*async*/ {
-          /*Prediction prediction = await PlacesAutocomplete.show(
-            context: context,
-            apiKey: _apiKey,
-            onError: onError,
-            language: "es",
-            components: [Component(Component.country, "pe")],
-          );
-          displayPrediction(prediction, _scaffoldKey.currentState);*/
-        },
       ),
     );
   }
-
-  /*void onError(PlacesAutocompleteResponse response) {
-    // ignore: deprecated_member_use
-    _scaffoldKey.currentState.showSnackBar(
-      SnackBar(content: Text(response.errorMessage)),
-    );
-  }
-
-  Future<Null> displayPrediction(Prediction prediction, ScaffoldState scaffoldState) async {
-    if (prediction != null) {
-      GoogleMapsPlaces _places = GoogleMapsPlaces(
-        apiKey: _apiKey,
-        apiHeaders: await GoogleApiHeaders().getHeaders(),
-      );
-      PlacesDetailsResponse _detail = await _places.getDetailsByPlaceId(prediction.placeId);
-      final address = _detail.result.formattedAddress;
-      final lat = _detail.result.geometry.location.lat;
-      final lng = _detail.result.geometry.location.lng;
-      print("Address: $address Latitud: $lat Longitud: $lng");
-      setState(() {
-        addressController.text = address;
-      });
-    }
-  }*/
 
   Widget _textInput({controller, label, icon}) {
     return Container(
@@ -128,6 +118,34 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           ),
           labelText: label,
           icon: Icon(icon),
+        ),
+      ),
+    );
+  }
+
+  Widget _newDeliveryButton() {
+    return Container(
+      margin: EdgeInsets.only(top: 50),
+      child: SizedBox(
+        width: double.infinity,
+        height: 40,
+        child: ElevatedButton(
+          child: Text(
+            "REGISTRAR PEDIDO",
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            primary: primaryColor,
+            onPrimary: Colors.white,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
+          ),
+          onPressed: () {
+
+          },
         ),
       ),
     );

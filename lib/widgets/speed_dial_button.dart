@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:geodest/utils/colors.dart';
 import 'package:background_location/background_location.dart';
+
+import 'package:geodest/utils/colors.dart';
 
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
 import '../services/events_service.dart';
-
 import '../enums/speed_dial_action.dart';
 
 class SpeedDialButton extends StatefulWidget {

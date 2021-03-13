@@ -54,7 +54,6 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
     // final uiProvider = Provider.of<UiProvider>(context);
     // final currentIndex = uiProvider.selectedMenuOpt;
 
-    //TODO: sale error en cuando se hace un setState dentro de la función build()
     // if (currentIndex == 1) {
     //   print("Current index: $currentIndex");
     //   // obtainDeliveries();
@@ -65,8 +64,9 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Deliveries"),
+        title: const Text("Pedidos"),
         backgroundColor: primaryColor,
+        ///Para ocultar el botón atrás del AppBar
         automaticallyImplyLeading: false,
       ),
       body: FutureBuilder(
@@ -76,24 +76,13 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
             return ListView.builder(
               itemCount: snapshot.data.length,
               itemBuilder: (BuildContext ctx, int idx) {
-                return Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.motorcycle),
-                    title: Text("${snapshot.data[idx].address}"),
-                    // subtitle: Text("${snapshot.data[idx].receiver}"),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                    onTap: () {
-                      //TODO: show pedido details
-                      print("Show delivery details");
-                    },
-                  ),
-                );
+                return _deliveryCard(snapshot: snapshot, idx: idx);
               },
             );
           } else if (snapshot.hasError) {
             return const Padding(
               padding: EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0),
-              child: Text("Ocurrió un error. Refresca los deliveries nuevamente."),
+              child: Text("Ocurrió un error. Actualiza nuevamente los deliveries."),
             );
           } else {
             return const Padding(
@@ -104,6 +93,36 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         },
       ),
       floatingActionButton: SpeedDialButton(),
+    );
+  }
+
+  Widget _deliveryCard({snapshot, idx}) {
+    // print("Snapshot: ${snapshot.data[idx].toJson()} Idx: $idx");
+    return Column(
+      children: [
+        Container(height: 10),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 10),
+          child: Card(
+            elevation: 5,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.motorcycle),
+                  title: Text("${snapshot.data[idx].receiver}"),
+                  subtitle: Text("${snapshot.data[idx].address}"),
+                  // trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () {
+                    //TODO: show pedido details
+                    print("Show delivery details");
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

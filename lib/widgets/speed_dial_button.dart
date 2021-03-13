@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:background_location/background_location.dart';
@@ -130,11 +131,12 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
           case SpeedDialAction.AddDelivery: {
             //TODO: pushear la vista de añadir delivery
             print("Añadir delivery");
+            Navigator.pushNamed(context, 'new_delivery');
             break;
           }
           case SpeedDialAction.Logout: {
             StorageService.logout().then((_) {
-              Navigator.of(context).pushReplacementNamed('login');
+              Navigator.pushNamedAndRemoveUntil(context, 'login', (_) => false);
             });
             print("logout");
             break;

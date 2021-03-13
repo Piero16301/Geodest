@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
             Expanded(
               flex: 1,
               child: Container(
-                margin: EdgeInsets.only(left: 20, right: 20, top: 20),
+                margin: EdgeInsets.only(left: 20, right: 20),
                 child: ListView(
                   //mainAxisSize: MainAxisSize.max,
                   children: <Widget>[

@@ -69,28 +69,31 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         ///Para ocultar el botón atrás del AppBar
         automaticallyImplyLeading: false,
       ),
-      body: FutureBuilder(
-        future: obtainDeliveries(),
-        builder: (BuildContext ctx, AsyncSnapshot<List<DeliveryResponse>> snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (BuildContext ctx, int idx) {
-                return _deliveryCard(snapshot: snapshot, idx: idx);
-              },
-            );
-          } else if (snapshot.hasError) {
-            return const Padding(
-              padding: EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0),
-              child: Text("Ocurrió un error. Actualiza nuevamente los deliveries."),
-            );
-          } else {
-            return const Padding(
-              padding: EdgeInsets.only(top: 20.0, left: 10.0, right: 10.0),
-              child: LinearProgressIndicator(),
-            );
-          }
-        },
+      body: Container(
+        margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+        child: FutureBuilder(
+          future: obtainDeliveries(),
+          builder: (BuildContext ctx, AsyncSnapshot<List<DeliveryResponse>> snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext ctx, int idx) {
+                  return _deliveryCard(snapshot: snapshot, idx: idx);
+                },
+              );
+            } else if (snapshot.hasError) {
+              return const Padding(
+                padding: EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0),
+                child: Text("Ocurrió un error. Actualiza nuevamente los deliveries."),
+              );
+            } else {
+              return const Padding(
+                padding: EdgeInsets.only(top: 20.0, left: 10.0, right: 10.0),
+                child: LinearProgressIndicator(),
+              );
+            }
+          },
+        ),
       ),
       floatingActionButton: SpeedDialButton(),
     );
@@ -102,7 +105,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       children: [
         Container(height: 10),
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 10),
+          //margin: EdgeInsets.symmetric(horizontal: 10),
           child: Card(
             elevation: 5,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -115,7 +118,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   // trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     //TODO: show pedido details
-                    print("Show delivery details");
+                    Navigator.pushNamed(context, 'delivery_details', arguments: snapshot.data[idx]);
                   },
                 ),
               ],

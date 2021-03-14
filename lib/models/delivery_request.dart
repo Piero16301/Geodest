@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class DeliveryRequest {
   DeliveryRequest({this.address, this.latitude, this.longitude, this.receiver, this.phone});
 

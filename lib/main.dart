@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geodest/pages/delivery_details_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:geodest/providers/ui_provider.dart';
@@ -25,11 +26,12 @@ class MyApp extends StatelessWidget {
         title: 'Geodest',
         initialRoute: 'splash',
         routes: {
-          'splash'       : (BuildContext context) => SplashPage(),
-          'login'        : (BuildContext context) => LoginPage(),
-          'register'     : (BuildContext context) => RegisterPage(),
-          'deliveries'   : (BuildContext context) => DeliveriesPage(),
-          'new_delivery' : (BuildContext context) => NewDeliveryPage(),
+          'splash'           : (BuildContext context) => SplashPage(),
+          'login'            : (BuildContext context) => LoginPage(),
+          'register'         : (BuildContext context) => RegisterPage(),
+          'deliveries'       : (BuildContext context) => DeliveriesPage(),
+          'new_delivery'     : (BuildContext context) => NewDeliveryPage(),
+          'delivery_details' : (BuildContext context) => DeliveryDetailsPage(),
         },
       ),
     );

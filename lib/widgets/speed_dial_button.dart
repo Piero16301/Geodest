@@ -130,7 +130,6 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
           }
           case SpeedDialAction.AddDelivery: {
             //TODO: pushear la vista de añadir delivery
-            print("Añadir delivery");
             Navigator.pushNamed(context, 'new_delivery');
             break;
           }

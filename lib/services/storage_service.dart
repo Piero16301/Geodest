@@ -14,7 +14,7 @@ class StorageService {
     return prefs.getString('refreshToken') ?? "";
   }
 
-  static void removeRefreshToken() async {
+  static Future<void> removeRefreshToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('refreshToken');
   }
@@ -31,7 +31,7 @@ class StorageService {
     return prefs.getString('accessToken') ?? "";
   }
 
-  static void removeAccessToken() async {
+  static Future<void> removeAccessToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('accessToken');
   }
@@ -48,7 +48,7 @@ class StorageService {
     return prefs.getString('email') ?? "";
   }
 
-  static void removeEmail() async {
+  static Future<void> removeEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('email');
   }
@@ -65,7 +65,7 @@ class StorageService {
     return prefs.getString('username') ?? "";
   }
 
-  static void removeUsername() async {
+  static Future<void> removeUsername() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
   }
@@ -82,19 +82,18 @@ class StorageService {
     return prefs.getBool('isSharingLocation') ?? false;
   }
 
-  static void removeIsSharingLocation() async {
+  static Future<void> removeIsSharingLocation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
   }
 
   /// logout
   static Future<void> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     await removeAccessToken();
     await removeRefreshToken();
     await removeIsSharingLocation();
     await removeIsSharingLocation();
-    /// asumo que no esta compartiendo ubicacion cuando hace logout
+    /// FIXME: asumo que no esta compartiendo ubicacion cuando hace logout
   }
 
 }

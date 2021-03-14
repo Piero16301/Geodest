@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:geodest/models/user.dart';
+import 'package:geodest/services/dialog_service.dart';
 import 'package:geodest/services/storage_service.dart';
 import 'package:geodest/utils/colors.dart';
 
@@ -105,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                                       } else {
                                         ///dialog diciendo que las credenciales son incorrectas
                                         Navigator.of(context).pop();
-                                        _mostrarAlert(context);
+                                        DialogService.mostrarAlert(context: context, title: "Credenciales incorrectas", subtitle: "Verifica tu correo y/o contraseña e inténtalo de nuevo");
                                       }
                                     });
                                   }
@@ -233,31 +234,5 @@ class _LoginPageState extends State<LoginPage> {
       _isHidden = !_isHidden;
     });
   }
-
-  void _mostrarAlert(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-          title: Text('Credenciales incorrectas'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text('Verifica tu correo electrónico y contraseña e inténtalo nuevamente'),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Ok'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        );
-      }
-    );
-  }
-
 }
 

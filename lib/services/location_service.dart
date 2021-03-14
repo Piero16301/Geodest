@@ -63,6 +63,8 @@ class LocationService {
       await LocationService.start();
 
       BackgroundLocation.getLocationUpdates((Location location) {
+        //TODO: connect again to socket
+        print("channel: $channel");
         print("Location update at ${DateTime.now()}: (lat: ${location.latitude}, long: ${location.longitude})");
         sendLocation(location);
       });

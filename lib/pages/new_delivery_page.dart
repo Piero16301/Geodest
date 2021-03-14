@@ -161,7 +161,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
                   final body = jsonDecode(res.body);
                   print("Body del nuevo pedido: $body");
                   EventsService.emitter.emit("refreshDeliveries");
-                  Navigator.pushNamedAndRemoveUntil(context, 'deliveries', (_) => false);
+                  Navigator.popUntil(context, (route) => route.settings.name == "deliveries");
                 } else {
                   Navigator.of(context).pop();
                   _mostrarAlert(context: context, title: 'No se pudo guardar el pedido', content: 'Verifica todos los campos e inténtalo nuevamente');

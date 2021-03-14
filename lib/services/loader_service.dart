@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 class LoaderService {
 
-  static BuildContext buildContext;
+  static BuildContext _buildContext;
 
   static void setIsLoading({bool waiting, BuildContext context, String message = ''}) {
     if (waiting) {
-      buildContext = context;
+      _buildContext = context;
       showDialog(
         context: context,
         builder: (_) {
@@ -22,7 +22,7 @@ class LoaderService {
     } else {
       //TODO: va a dar error si se llaman dos veces seguidas a
       // setIsLoading(false)
-      Navigator.of(buildContext).pop();
+      Navigator.of(_buildContext).pop();
     }
   }
 

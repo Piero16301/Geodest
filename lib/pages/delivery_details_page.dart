@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:geodest/models/delivery_response.dart';
+import 'package:geodest/services/client_service.dart';
+import 'package:geodest/services/dialog_service.dart';
+import 'package:geodest/services/loader_service.dart';
 import 'package:geodest/utils/colors.dart';
 
 class DeliveryDetailsPage extends StatefulWidget {
@@ -9,10 +12,13 @@ class DeliveryDetailsPage extends StatefulWidget {
 }
 
 class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
+
+  DeliveryResponse deliveryResponse;
+
   @override
   Widget build(BuildContext context) {
 
-    final DeliveryResponse deliveryResponse = ModalRoute.of(context).settings.arguments;
+    deliveryResponse = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(
@@ -107,9 +113,53 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
       label: Text('Finalizar'),
       icon: Icon(Icons.check),
       backgroundColor: primaryColor,
-      onPressed: () {},
+      onPressed: () {
+        print("Finalizar delivery");
+        _confirmFinishDelivery(context);
+      },
     );
   }
+
+  void _confirmFinishDelivery(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            title: Text("Marcar pedido como finalizado?"),
+            actions: [
+              TextButton(
+                child: Text("Sí"),
+                onPressed: () {
+                  int pk = deliveryResponse.pk;
+                  ClientService.completeDelivery(pk).then((res) {
+                    //TODO: feedback cuando
+                    if (res.statusCode == 200) {
+                      print("Pedido marcado como completado");
+                      ///funciona pero da exception por alguna razon
+                      DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "Pedido marcado como completado", popUntilDeliveriesPage: true);
+                    } else {
+                      print("Error en marcar pedido como completado, intentar de nuevo");
+                      //TODO: se tiene que meterle dismiss a este dialog
+                      DialogService.mostrarAlert(context: context, title: "Oops", subtitle: "Ocurrió un error. Inténtalo de nuevo");
+                      // Navigator.of(ctx).pop();
+                    }
+                  });
+                },
+              ),
+              TextButton(
+                child: Text("No"),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+
 
 }
 

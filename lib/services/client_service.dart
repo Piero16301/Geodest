@@ -51,7 +51,7 @@ class ClientService {
 
   static Future<http.Response> completeDelivery(int id) async {
     return await _client.put(
-        Uri.parse("${CommonService.deliveryUrl}/$id"),
+        Uri.parse("${CommonService.deliveryUrl}/$id/"),
         headers: <String, String> {
           'Content-Type': 'application/json'
         }

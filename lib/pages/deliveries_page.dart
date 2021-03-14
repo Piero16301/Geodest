@@ -10,7 +10,6 @@ import 'package:geodest/widgets/speed_dial_button.dart';
 import '../services/events_service.dart';
 
 class DeliveriesPage extends StatefulWidget {
-
   DeliveriesPage();
 
   @override
@@ -20,7 +19,6 @@ class DeliveriesPage extends StatefulWidget {
 class _DeliveriesPageState extends State<DeliveriesPage> {
 
   Future<List<DeliveryResponse>> obtainDeliveries() async {
-    //FIXME: aveces da 401 (porq expira el accessToken creo)
     var res = await ClientService.getDeliveries();
 
     if (res.statusCode == 200) {
@@ -33,7 +31,6 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       return parsedDeliveries;
     } else {
       throw "[ERROR] (status code ${res.statusCode}): fetching deliveries";
-      //TODO: mostrar dialog indicando el error
     }
   }
 
@@ -50,16 +47,6 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    // final uiProvider = Provider.of<UiProvider>(context);
-    // final currentIndex = uiProvider.selectedMenuOpt;
-
-    // if (currentIndex == 1) {
-    //   print("Current index: $currentIndex");
-    //   // obtainDeliveries();
-    //   // uiProvider.selectedMenuOpt = 0;
-    //   print("Current index: $currentIndex");
-    // }
 
     return Scaffold(
       appBar: AppBar(
@@ -82,9 +69,15 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                 },
               );
             } else if (snapshot.hasError) {
+              //TODO: retry request
               return const Padding(
                 padding: EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0),
-                child: Text("Ocurrió un error. Actualiza nuevamente los deliveries."),
+                child: Text(
+                    "Ocurrió un error. Actualiza nuevamente los pedidos.",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                ),
               );
             } else {
               return const Padding(
@@ -118,7 +111,11 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   // trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     //TODO: show pedido details
-                    Navigator.pushNamed(context, 'delivery_details', arguments: snapshot.data[idx]);
+                    Navigator.pushNamed(context, 'delivery_details', arguments: snapshot.data[idx]).then((_) {
+                      setState(() {
+                        print("refreshing deliveries");
+                      });
+                    });
                   },
                 ),
               ],

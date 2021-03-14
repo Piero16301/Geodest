@@ -32,7 +32,7 @@ class ClientService {
 
   static Future<http.Response> postDelivery(Map<String, dynamic> body) async {
     return await _client.post(
-        Uri.parse(CommonService.deliveryUrl),
+        Uri.parse("${CommonService.deliveryUrl}/"),
         body: jsonEncode(body),
         headers: <String, String> {
           'Content-Type': 'application/json'

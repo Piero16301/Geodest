@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:geodest/models/delivery_response.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/services/dialog_service.dart';
-import 'package:geodest/services/loader_service.dart';
 import 'package:geodest/utils/colors.dart';
 
 class DeliveryDetailsPage extends StatefulWidget {

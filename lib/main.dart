@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geodest/pages/delivery_details_page.dart';
+import 'package:geodest/pages/map_view_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:geodest/providers/ui_provider.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
           'deliveries'       : (BuildContext context) => DeliveriesPage(),
           'new_delivery'     : (BuildContext context) => NewDeliveryPage(),
           'delivery_details' : (BuildContext context) => DeliveryDetailsPage(),
+          'map_view'         : (BuildContext context) => MapViewPage(),
         },
       ),
     );

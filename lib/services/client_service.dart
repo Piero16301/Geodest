@@ -83,4 +83,33 @@ class ClientService {
     );
   }
 
+  /// general
+  static Future<http.Response> sendRequest({String url, String method, String body, Map<String, String> headers}) async {
+    switch (method) {
+      case "GET": {
+        return await _client.get(
+          Uri.parse(url),
+          headers: headers
+        );
+      }
+      case "POST": {
+        return await _client.post(
+            Uri.parse(url),
+            headers: headers,
+            body: body
+        );
+      }
+      case "PUT": {
+        return await _client.put(
+            Uri.parse(url),
+            headers: headers
+        );
+      }
+      default: {
+        print("add the request method");
+        return null;
+      }
+    }
+  }
+
 }

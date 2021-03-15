@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geodest/models/delivery_request.dart';
 
@@ -41,8 +42,8 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
               child: Column(
                 children: [
                   _addressInput(controller: addressController, label: "Dirección del comprador", icon: Icons.home),
-                  _textInput(controller: clientController, label: "Nombre del comprador", icon: Icons.person),
-                  _textInput(controller: phoneController, label: "Celular del comprador", icon: Icons.phone_android),
+                  _clientInput(controller: clientController, label: "Nombre del comprador", icon: Icons.person),
+                  _phoneInput(controller: phoneController, label: "Celular del comprador", icon: Icons.phone_android),
                   _createNewDelivery(),
                 ],
               ),
@@ -68,7 +69,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   Widget _addressInput({controller, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
-      height: 60,
+      height: 80,
       child: TextFormField(
         controller: controller,
         validator: (value) {
@@ -104,16 +105,40 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
     );
   }
 
-  Widget _textInput({controller, label, icon}) {
+  bool _isNumeric(String s) {
+    try{
+      var value = double.parse(s);
+    } on FormatException {
+      return false;
+    }
+    return true;
+  }
+
+  bool _checkString(String input) {
+    bool result = true;
+    input.runes.forEach((int rune) {
+      var character = new String.fromCharCode(rune);
+      if (_isNumeric(character)) {
+        result = false;
+      }
+    });
+    return result;
+  }
+
+  Widget _clientInput({controller, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
-      height: 60,
+      height: 80,
       child: TextFormField(
         controller: controller,
         validator: (value) {
           if (value.isEmpty) {
             String tempLabel = label.toString().toLowerCase();
             return 'Por favor, ingrese el $tempLabel';
+          }
+          else if (!_checkString(value)) {
+            String tempLabel = label.toString().toLowerCase();
+            return 'El $tempLabel solo debe contener letras';
           }
           return null;
         },
@@ -124,6 +149,38 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           labelText: label,
           icon: Icon(icon),
         ),
+      ),
+    );
+  }
+
+  Widget _phoneInput({controller, label, icon}) {
+    return Container(
+      margin: EdgeInsets.only(top: 30),
+      height: 80,
+      child: TextFormField(
+        controller: controller,
+        validator: (value) {
+          if (value.isEmpty) {
+            String tempLabel = label.toString().toLowerCase();
+            return 'Por favor, ingrese el $tempLabel';
+          }
+          else if (value.length != 9) {
+            String tempLabel = label.toString().toLowerCase();
+            return 'El $tempLabel debe tener 9 dígitos';
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          labelText: label,
+          icon: Icon(icon),
+        ),
+        keyboardType: TextInputType.phone,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly
+        ],
       ),
     );
   }

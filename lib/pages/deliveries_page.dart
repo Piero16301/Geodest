@@ -1,11 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_sms/flutter_sms.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:geodest/models/delivery_response.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:geodest/widgets/speed_dial_button.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 import '../services/events_service.dart';
 
@@ -98,24 +104,70 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       children: [
         Container(height: 10),
         Container(
-          //margin: EdgeInsets.symmetric(horizontal: 10),
           child: Card(
             elevation: 5,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(Icons.motorcycle),
-                  title: Text("${snapshot.data[idx].receiver}"),
-                  subtitle: Text("${snapshot.data[idx].address}"),
-                  // trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    //TODO: show pedido details
-                    Navigator.pushNamed(context, 'delivery_details', arguments: snapshot.data[idx]).then((_) {
-                      setState(() {
-                        print("refreshing deliveries");
+            child: Slidable(
+              actionPane: SlidableDrawerActionPane(),
+              actionExtentRatio: 0.25,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.motorcycle),
+                    title: Text("${snapshot.data[idx].receiver}"),
+                    subtitle: Text("${snapshot.data[idx].address}"),
+                    // trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () {
+                      ///mostrar detalles del pedido
+                      Navigator.pushNamed(context, 'delivery_details', arguments: snapshot.data[idx]).then((_) {
+                        setState(() {
+                          print("refreshing deliveries");
+                        });
                       });
+                    },
+                  ),
+                ],
+              ),
+              secondaryActions: [
+                IconSlideAction(
+                  caption: 'Copiar',
+                  color: Colors.white,
+                  foregroundColor: Colors.black,
+                  icon: Icons.copy,
+                  onTap: () {
+                    String deliveryURL = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
+                    Clipboard.setData(ClipboardData(text: deliveryURL));
+                    print("URL $deliveryURL copiada al portapapeles");
+                  },
+                ),
+                IconSlideAction(
+                  caption: 'SMS',
+                  color: Colors.white,
+                  icon: Icons.sms,
+                  foregroundColor: Colors.blue,
+                  onTap: () async {
+                    List<String> number = ["+51${snapshot.data[idx].phone}"];
+                    String message = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
+                    String result = await FlutterSms.sendSMS(message: message, recipients: number)
+                    .catchError((onError) {
+                      print(onError);
                     });
+                    print(result);
+                  },
+                ),
+                IconSlideAction(
+                  caption: 'WhatsApp',
+                  color: Colors.white,
+                  foregroundColor: Colors.green,
+                  icon: MdiIcons.whatsapp,
+                  onTap: () async {
+                    String number = "+51${snapshot.data[idx].phone}";
+                    String message = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
+                    final whatsAppLink = WhatsAppUnilink(
+                      phoneNumber: number,
+                      text: message,
+                    );
+                    await launch('$whatsAppLink');
                   },
                 ),
               ],

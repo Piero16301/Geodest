@@ -139,11 +139,13 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                     if (res.statusCode == 200) {
                       print("Pedido marcado como completado");
                       ///funciona pero da exception por alguna razon
-                      DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "Pedido marcado como completado", popUntilDeliveriesPage: true);
+                      Navigator.of(context).pop();
+                      DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "Pedido marcado como completado.", popUntilDeliveriesPage: true);
                     } else {
                       print("Error en marcar pedido como completado, intentar de nuevo");
                       //TODO: se tiene que meterle dismiss a este dialog
-                      DialogService.mostrarAlert(context: context, title: "Oops", subtitle: "Ocurrió un error. Inténtalo de nuevo");
+                      Navigator.of(context).pop();
+                      DialogService.mostrarAlert(context: context, title: "Ups", subtitle: "Ocurrió un error. POr favor, inténtalo nuevamente.");
                       // Navigator.of(ctx).pop();
                     }
                   });

@@ -108,6 +108,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   bool _isNumeric(String s) {
     try{
       var value = double.parse(s);
+      print(value);
     } on FormatException {
       return false;
     }

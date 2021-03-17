@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http_interceptor/http_interceptor.dart';
-import 'package:http/http.dart' as http show Response, Request, StreamedResponse;
+import 'package:http/http.dart' as http show Response;
 
 import '../services/storage_service.dart';
 import '../services/client_service.dart';

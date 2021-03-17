@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                                       if (res.statusCode == 200) {
                                         final body = jsonDecode(res.body);
                                         print("Body del login: $body");
-                                        //TODO: save Access and Refresh token
+                                        ///save Access and Refresh token
                                         StorageService.saveAccessToken(body['access']).then((_) {
                                           StorageService.saveRefreshToken(body['refresh']).then((_) {
                                             LoaderService.setIsLoading(waiting: false);
@@ -176,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _textEmailInput({controller, hint, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
-      height: 60,
+      height: 70,
       child: TextFormField(
         controller: controller,
         validator: (value) {
@@ -201,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _textPasswordInput({controller, hint, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
-      height: 60,
+      height: 70,
       child: TextFormField(
         controller: controller,
         validator: (value) {

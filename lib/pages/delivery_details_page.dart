@@ -128,7 +128,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         builder: (BuildContext ctx) {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            title: Text("Marcar pedido como finalizado?"),
+            title: Text("¿Seguro que quiere finalizar el pedido?"),
             actions: [
               TextButton(
                 child: Text("Sí"),

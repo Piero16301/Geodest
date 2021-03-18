@@ -20,7 +20,7 @@ class DialogService {
             actions: <Widget>[
               TextButton(
                 child: Text('OK'),
-                onPressed: () {
+                onPressed: () async {
                   if (popUntilDeliveriesPage) {
                     Navigator.popUntil(context, (route) => route.settings.name == "deliveries");
                   } else {

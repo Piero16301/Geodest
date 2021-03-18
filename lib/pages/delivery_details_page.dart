@@ -4,6 +4,8 @@ import 'package:geodest/models/delivery_response.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/services/dialog_service.dart';
 import 'package:geodest/utils/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 class DeliveryDetailsPage extends StatefulWidget {
   @override
@@ -128,24 +130,31 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         builder: (BuildContext ctx) {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            title: Text("¿Seguro que quiere finalizar el pedido?"),
+            title: Text("¿Seguro que quieres finalizar el pedido?"),
             actions: [
               TextButton(
                 child: Text("Sí"),
                 onPressed: () {
                   int pk = deliveryResponse.pk;
-                  ClientService.completeDelivery(pk).then((res) {
+                  ClientService.completeDelivery(pk).then((res) async {
                     //TODO: feedback cuando
                     if (res.statusCode == 200) {
                       print("Pedido marcado como completado");
                       ///funciona pero da exception por alguna razon
                       Navigator.of(context).pop();
-                      DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "Pedido marcado como completado.", popUntilDeliveriesPage: true);
+                      String number = "+51${deliveryResponse.phone}";
+                      String message = "Caudal Service: Tu pedido ha sido entregado.";
+                      final whatsAppLink = WhatsAppUnilink(
+                        phoneNumber: number,
+                        text: message,
+                      );
+                      await launch('$whatsAppLink');
+                      DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "El pedido se ha finalizado.", popUntilDeliveriesPage: true);
                     } else {
                       print("Error en marcar pedido como completado, intentar de nuevo");
                       //TODO: se tiene que meterle dismiss a este dialog
                       Navigator.of(context).pop();
-                      DialogService.mostrarAlert(context: context, title: "Ups", subtitle: "Ocurrió un error. POr favor, inténtalo nuevamente.");
+                      DialogService.mostrarAlert(context: context, title: "Ups", subtitle: "Ocurrió un error. Por favor, inténtalo nuevamente.");
                       // Navigator.of(ctx).pop();
                     }
                   });

@@ -133,7 +133,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   caption: 'Copiar',
                   color: Colors.white,
                   foregroundColor: Colors.black,
-                  icon: Icons.copy,
+                  icon: MdiIcons.contentCopy,
                   onTap: () {
                     String deliveryURL = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
                     Clipboard.setData(ClipboardData(text: deliveryURL));
@@ -143,7 +143,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                 IconSlideAction(
                   caption: 'SMS',
                   color: Colors.white,
-                  icon: Icons.sms,
+                  icon: MdiIcons.message,
                   foregroundColor: Colors.blue,
                   onTap: () async {
                     List<String> number = ["+51${snapshot.data[idx].phone}"];

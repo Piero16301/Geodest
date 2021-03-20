@@ -115,7 +115,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
       context: context,
       apiKey: 'AIzaSyDszjoQPzSF_ddL2pXODJy2nwZoT2IfYGI',
       mode: Mode.overlay,
-      language: "es-419",
+      language: "es",
       components: [Component(Component.country, "pe")],
     );
     if (prediction != null) {

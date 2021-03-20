@@ -147,7 +147,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.blue,
                   onTap: () async {
                     List<String> number = ["+51${snapshot.data[idx].phone}"];
-                    String message = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
+                    String message = "Rastrea tu pedido en: https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
                     String result = await FlutterSms.sendSMS(message: message, recipients: number)
                     .catchError((onError) {
                       print(onError);
@@ -162,7 +162,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   icon: MdiIcons.whatsapp,
                   onTap: () async {
                     String number = "+51${snapshot.data[idx].phone}";
-                    String message = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
+                    String message = "Rastrea tu pedido en: https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
                     final whatsAppLink = WhatsAppUnilink(
                       phoneNumber: number,
                       text: message,

@@ -4,6 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geodest/models/delivery_request.dart';
 
+import 'package:google_api_headers/google_api_headers.dart';
+import 'package:google_maps_webservice/places.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
+
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/services/events_service.dart';
 import 'package:geodest/services/loader_service.dart';
@@ -19,7 +23,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   final clientController = TextEditingController();
   final phoneController = TextEditingController();
 
-  Address finalAddress = Address();
+  PlacesDetailsResponse finalAddress;
 
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -85,7 +89,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           ),
           labelText: label,
           icon: Icon(icon),
-          suffix: InkWell(
+          /*suffix: InkWell(
             onTap: () async {
               Address result = await searchAddress();
               if (result != null) {
@@ -99,10 +103,37 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
               }
             },
             child: Icon(Icons.search),
-          ),
+          ),*/
         ),
+        onTap: _displaySuggestions,
       ),
     );
+  }
+
+  Future<void> _displaySuggestions() async {
+    Prediction prediction = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: 'AIzaSyDszjoQPzSF_ddL2pXODJy2nwZoT2IfYGI',
+      mode: Mode.overlay,
+      language: "es-419",
+      components: [Component(Component.country, "pe")],
+    );
+    if (prediction != null) {
+      _setNewAddress(prediction);
+    }
+  }
+
+  Future<Null> _setNewAddress(Prediction prediction) async {
+    GoogleMapsPlaces googleMapsPlaces = GoogleMapsPlaces(
+      apiKey: 'AIzaSyDszjoQPzSF_ddL2pXODJy2nwZoT2IfYGI',
+      apiHeaders: await GoogleApiHeaders().getHeaders(),
+    );
+
+    PlacesDetailsResponse placesDetailsResponse = await googleMapsPlaces.getDetailsByPlaceId(prediction.placeId);
+    setState(() {
+      addressController.text = placesDetailsResponse.result.formattedAddress;
+      finalAddress = placesDetailsResponse;
+    });
   }
 
   bool _isNumeric(String s) {
@@ -209,7 +240,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           onPressed: () {
             if (_formKey.currentState.validate()) {
               LoaderService.setIsLoading(message: "Guardando pedido...", waiting: true, context: context);
-              DeliveryRequest delivery = DeliveryRequest(address: addressController.text, latitude: finalAddress.coordinates.latitude, longitude: finalAddress.coordinates.longitude, receiver: clientController.text, phone: int.parse(phoneController.text));
+              DeliveryRequest delivery = DeliveryRequest(address: addressController.text, latitude: finalAddress.result.geometry.location.lat, longitude: finalAddress.result.geometry.location.lng, receiver: clientController.text, phone: int.parse(phoneController.text));
               print("Delivery: ${delivery.toJson()}");
               ClientService.postDelivery(
                 delivery.toJson()

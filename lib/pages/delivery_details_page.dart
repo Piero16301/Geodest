@@ -98,9 +98,9 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                     Navigator.pushNamed(context, 'map_view', arguments: delivery);
                   },
                   child: FadeInImage(
-                    image: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&markers=color:red%7C$lat,$lng&zoom=16&size=2000x2000&key=AIzaSyCw0h5QGQWJSHiY4L289Og34FRlWdltZlo'),
+                    image: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&markers=color:red%7C$lat,$lng&zoom=16&size=2000x2000&key=AIzaSyDszjoQPzSF_ddL2pXODJy2nwZoT2IfYGI'),
                     placeholder: AssetImage('assets/google-maps-loading.gif'),
-                    fadeInDuration: Duration(milliseconds: 1000),
+                    fadeInDuration: Duration(milliseconds: 500),
                     fit: BoxFit.cover,
                   ),
                 ),

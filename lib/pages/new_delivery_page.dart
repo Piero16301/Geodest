@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geocoder/geocoder.dart';
 import 'package:geodest/models/delivery_request.dart';
+import 'package:geodest/services/dialog_service.dart';
 
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_webservice/places.dart';
@@ -58,18 +58,6 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
     );
   }
 
-  Future<Address> searchAddress() async {
-    try {
-      List<Address> results = await Geocoder.local.findAddressesFromQuery(addressController.text);
-      Address bestResult = results.first;
-      print("Result: ${bestResult.toMap()}");
-      return bestResult;
-    } catch(e) {
-      print("Error occured: $e");
-      return null;
-    }
-  }
-
   Widget _addressInput({controller, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
@@ -89,21 +77,6 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           ),
           labelText: label,
           icon: Icon(icon),
-          /*suffix: InkWell(
-            onTap: () async {
-              Address result = await searchAddress();
-              if (result != null) {
-                setState(() {
-                  addressController.text = result.addressLine;
-                  finalAddress = result;
-                });
-              } else {
-                ///mostrar alert que no existe la dirección
-                _mostrarAlert(context: context, title: 'Dirección incorrecta', content: 'La dirección ingresada no ha sido encontrada, verifica los datos');
-              }
-            },
-            child: Icon(Icons.search),
-          ),*/
         ),
         onTap: _displaySuggestions,
       ),
@@ -253,38 +226,13 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
                   Navigator.popUntil(context, (route) => route.settings.name == "deliveries");
                 } else {
                   Navigator.of(context).pop();
-                  _mostrarAlert(context: context, title: 'No se pudo guardar el pedido', content: 'Verifica todos los campos e inténtalo nuevamente');
+                  DialogService.mostrarAlert(context: context, title: 'No se pudo guardar el pedido', subtitle: 'Verifica todos los campos e inténtalo nuevamente.');
                 }
               });
             }
           },
         ),
       ),
-    );
-  }
-
-  void _mostrarAlert({context, title, content}) {
-    showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            title: Text(title),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(content),
-              ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Ok'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        }
     );
   }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:geodest/services/navigation_service.dart';
 import 'package:http_interceptor/http_interceptor.dart';
 import 'package:http/http.dart' as http show Response;
 
@@ -56,6 +57,12 @@ class GeodestInterceptor implements InterceptorContract {
       http.Response res = await ClientService.refreshToken();
 
       print(res.body);
+
+      if (res.statusCode == 401) {
+        await StorageService.logout();
+        NavigationService.navigatorKey.currentState.pushReplacementNamed('login');
+        return data;
+      }
 
       Map body = jsonDecode(res.body);
 

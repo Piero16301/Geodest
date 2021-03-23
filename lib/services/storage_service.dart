@@ -92,7 +92,7 @@ class StorageService {
     await removeAccessToken();
     await removeRefreshToken();
     await removeIsSharingLocation();
-    await removeIsSharingLocation();
+    await removeUsername();
     /// FIXME: asumo que no esta compartiendo ubicacion cuando hace logout
   }
 

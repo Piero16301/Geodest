@@ -154,7 +154,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       print("Error en marcar pedido como completado, intentar de nuevo");
                       //TODO: se tiene que meterle dismiss a este dialog
                       Navigator.of(context).pop();
-                      DialogService.mostrarAlert(context: context, title: "Ups", subtitle: "Ocurrió un error. Por favor, inténtalo nuevamente.");
+                      DialogService.mostrarAlert(context: context, title: "Ups", subtitle: "Ocurrió un error. Por favor, inténtalo más tarde.");
                       // Navigator.of(ctx).pop();
                     }
                   });

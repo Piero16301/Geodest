@@ -79,7 +79,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
               return const Padding(
                 padding: EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0),
                 child: Text(
-                    "Ocurrió un error. Actualiza nuevamente los pedidos.",
+                  "Ocurrió un error. Inténtalo de nuevo más tarde.",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),

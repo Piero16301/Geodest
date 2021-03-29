@@ -71,6 +71,8 @@ class GeodestInterceptor implements InterceptorContract {
       } else {
         print("REFRESHED TOKEN BUT GOT NO NEW ACCESS TOKEN");
         /// creo q en este caso, tenemos que desloguear al usuario
+        /// o el usuario hizo login con las credenciales incorrectas
+        return data;
       }
 
       //FIXME: tengo q retornar la data de este request

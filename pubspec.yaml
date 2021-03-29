@@ -37,8 +37,8 @@ dependencies:
   http: ^0.13.0                            # Android | iOS | Web | Linux | MacOS | Windows
   shared_preferences: ^2.0.3               # Android | iOS | Web | Linux | MacOS | Windows
   background_location: ^0.4.0              # Android | iOS
-  app_settings: ^4.1.0                     # Android | iOS
   web_socket_channel: ^2.0.0               # Android | iOS | Web | Linux | MacOS | Windows
+  system_settings: ^2.0.0
   flutter_web_browser: ^0.13.1             # Android | iOS
   provider: ^5.0.0                         # Android | iOS | Web | Linux | MacOS | Windows
   eventify: ^0.1.4                         # Android | iOS | Web | Linux | MacOS | Windows

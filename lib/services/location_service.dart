@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:background_location/background_location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:app_settings/app_settings.dart';
+import 'package:system_settings/system_settings.dart';
 import 'package:web_socket_channel/io.dart';
 import 'common_service.dart';
 import 'storage_service.dart';
@@ -52,7 +52,7 @@ class LocationService {
     );
     BackgroundLocation.setAndroidConfiguration(10000);
     //TODO: descomentar lo de abajo antes del deploy
-    // BackgroundLocation.startLocationService(distanceFilter : 50);
+    BackgroundLocation.startLocationService(distanceFilter: 0);
     BackgroundLocation.startLocationService();
   }
 
@@ -117,7 +117,7 @@ class LocationService {
                 onPressed: () {
                   Navigator.of(context).pop();
                   //FIXME: lo de abajo no funca
-                  AppSettings.openLocationSettings();
+                  SystemSettings.app();
                 },
                 child: const Text("OK")
             )

@@ -5,13 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:share/share.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 import 'package:geodest/models/delivery_response.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:geodest/widgets/speed_dial_button.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 import '../services/events_service.dart';
 
@@ -131,8 +132,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
               secondaryActions: [
                 IconSlideAction(
                   caption: 'Copiar',
-                  color: Colors.white,
-                  foregroundColor: Colors.black,
+                  color: Colors.transparent,
+                  foregroundColor: Colors.black54,
                   icon: MdiIcons.contentCopy,
                   onTap: () {
                     String deliveryURL = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
@@ -142,7 +143,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                 ),
                 IconSlideAction(
                   caption: 'SMS',
-                  color: Colors.white,
+                  color: Colors.transparent,
                   icon: MdiIcons.message,
                   foregroundColor: Colors.blue,
                   onTap: () async {
@@ -157,7 +158,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                 ),
                 IconSlideAction(
                   caption: 'WhatsApp',
-                  color: Colors.white,
+                  color: Colors.transparent,
                   foregroundColor: Colors.green,
                   icon: MdiIcons.whatsapp,
                   onTap: () async {
@@ -168,6 +169,15 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                       text: message,
                     );
                     await launch('$whatsAppLink');
+                  },
+                ),
+                IconSlideAction(
+                  caption: 'Otro',
+                  color: Colors.transparent,
+                  foregroundColor: Colors.black54,
+                  icon: MdiIcons.share,
+                  onTap: () async {
+                    await Share.share("https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}");
                   },
                 ),
               ],

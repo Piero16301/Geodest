@@ -50,6 +50,7 @@ dependencies:
   material_design_icons_flutter: ^4.0.5955 # Android | iOS | Web | Linux | MacOS | Windows
   flutter_sms: ^1.1.0                      # Android | iOS
   whatsapp_unilink: ^1.0.0+1               # Android | iOS | Web | Linux | MacOS | Windows
+  share: ^2.0.1                            # Android | iOS
 
 dev_dependencies:
   flutter_test:

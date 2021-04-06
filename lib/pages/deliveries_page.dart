@@ -63,7 +63,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         automaticallyImplyLeading: false,
       ),
       body: Container(
-        margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+        margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
         child: FutureBuilder(
           future: obtainDeliveries(),
           builder: (BuildContext ctx, AsyncSnapshot<List<DeliveryResponse>> snapshot) {
@@ -147,7 +147,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.blue,
                   onTap: () async {
                     List<String> number = ["+51${snapshot.data[idx].phone}"];
-                    String message = "Rastrea tu pedido en: https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
+                    String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\nhttps://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
                     String result = await FlutterSms.sendSMS(message: message, recipients: number)
                     .catchError((onError) {
                       print(onError);
@@ -162,7 +162,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   icon: MdiIcons.whatsapp,
                   onTap: () async {
                     String number = "+51${snapshot.data[idx].phone}";
-                    String message = "Rastrea tu pedido en: https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
+                    String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\nhttps://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
                     final whatsAppLink = WhatsAppUnilink(
                       phoneNumber: number,
                       text: message,

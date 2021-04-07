@@ -1,13 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:background_location/background_location.dart';
+import 'package:geodest/services/client_service.dart';
 
 import 'package:geodest/utils/colors.dart';
 
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
 import '../services/events_service.dart';
+import '../services/dialog_service.dart';
 import '../enums/speed_dial_action.dart';
 
 class SpeedDialButton extends StatefulWidget {
@@ -64,7 +68,9 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       elevation: 5,
       shape: CircleBorder(),
       children: [
+        //TODO: cada _dialChild debería ser un widget, ya sea stateless o stateful, hay un switch enorme que no debería estar ahí (por legibilidad)
         _dialChild(action: SpeedDialAction.Logout, context: context, icon: Icon(Icons.logout), color: Colors.deepPurpleAccent, label: "Logout", route: 'login'),
+        _dialChild(action: SpeedDialAction.ShowCreditInfo, context: context, icon: Icon(Icons.attach_money), color: Colors.purpleAccent, label: "Mis Créditos"),
         _dialChild(action: SpeedDialAction.ShareLocation, context: context, icon: shareLocationIcon, color: shareLocationColor, label: shareLocationText, route: 'login'),
         _dialChild(action: SpeedDialAction.RefreshDeliveries, context: context, icon: Icon(Icons.update), color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
         _dialChild(action: SpeedDialAction.AddDelivery, context: context, icon: Icon(Icons.add), color: Colors.green, label: "Añadir Envío", route: 'login'),
@@ -99,6 +105,18 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             // uiProvider.selectedMenuOpt = 1;
             EventsService.emitter.emit("refreshDeliveries");
 
+            break;
+          }
+          case SpeedDialAction.ShowCreditInfo: {
+            //TODO: hacer request
+            //TODO: mandarle la data del responde al dialog
+            ClientService.getCreditInfo().then(
+              (res) {
+                final body = jsonDecode(res.body);
+                print("credit info data: $body");
+                DialogService.showCreditInfoDialog(context: context, remainingCredits: body['credits']);
+              }
+            );
             break;
           }
           case SpeedDialAction.ShareLocation: {

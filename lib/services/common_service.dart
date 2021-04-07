@@ -6,4 +6,6 @@ class CommonService {
   static const String refreshTokenUrl = baseUrl + '/auth/jwt/refresh';
   static const String verifyTokenUrl = baseUrl + '/auth/jwt/verify';
   static const String wsBaseUrl = 'wss://geosend.herokuapp.com/ws/deliveries';
+  static const String creditsUrl = baseUrl + '/api/credits';
+  static const String locationUpdateUrl = baseUrl + '/api/location';
 }

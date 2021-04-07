@@ -82,6 +82,38 @@ class ClientService {
         }
     );
   }
+  
+  /// credits
+  static Future<http.Response> getCreditInfo() async {
+    return await _client.get(
+      Uri.parse(CommonService.creditsUrl),
+      headers: <String, String> {
+        'Content-Type': 'application/json'
+      }
+    );
+  }
+
+  /// location update
+  static Future<http.Response> updateLocation(Map<String, dynamic> body) async {
+    return await _client.put(
+      Uri.parse(CommonService.locationUpdateUrl),
+      headers: <String, String> {
+        'Content-Type': 'application/json'
+      },
+      body: body,
+    );
+  }
+
+  /// iniciar/terminar viaje
+  static Future<http.Response> changeDeliveryState({int deliveryId, Map<String, dynamic> body}) async {
+    return await _client.put(
+      Uri.parse(CommonService.deliveryUrl + '/$deliveryId'),
+      headers: <String, String> {
+        'Content-Type': 'application/json'
+      },
+      body: body,
+    );
+  }
 
   /// general
   static Future<http.Response> sendRequest({String url, String method, String body, Map<String, String> headers}) async {

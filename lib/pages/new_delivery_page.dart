@@ -67,6 +67,9 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
 
   Widget _pillToggle() {
     return ToggleButtons(
+        selectedColor: Colors.green,
+        color: Colors.grey,
+        fillColor: Colors.lightGreen[100],
         borderRadius: BorderRadius.all(Radius.circular(10.0)),
         children: [
           Padding(

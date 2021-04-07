@@ -143,7 +143,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       ///funciona pero da exception por alguna razon
                       Navigator.of(context).pop();
                       String number = "+51${deliveryResponse.phone}";
-                      String message = "Caudal Service: Tu pedido ha sido entregado.";
+                      String message = "¡Hola de nuevo! ✋\nTu pedido ha llegado a su destino.";
                       final whatsAppLink = WhatsAppUnilink(
                         phoneNumber: number,
                         text: message,

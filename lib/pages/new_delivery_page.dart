@@ -22,7 +22,6 @@ class NewDeliveryPage extends StatefulWidget {
 
 class _NewDeliveryPageState extends State<NewDeliveryPage> {
   final addressController = TextEditingController();
-  final linkController = TextEditingController();
   final clientController = TextEditingController();
   final phoneController = TextEditingController();
 
@@ -52,7 +51,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
                 children: [
                   // FIXME: _addressInput y _pillToggle deberían ser un solo stateful widget, esto hace que sea más rápida la aplicación
                   if (_isSelected[0]) _addressInput(link: false, controller: addressController, label: "Dirección del comprador", icon: Icons.home),
-                  if (_isSelected[1]) _addressInput(link: true, controller: linkController, label: "Link de la dirección del comprador", icon: Icons.home),
+                  if (_isSelected[1]) _addressInput(link: true, controller: addressController, label: "Link de Google Maps", icon: Icons.home),
                   _pillToggle(),
                   _clientInput(controller: clientController, label: "Nombre del comprador", icon: Icons.person),
                   _phoneInput(controller: phoneController, label: "Celular del comprador", icon: Icons.phone_android),
@@ -68,12 +67,20 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
 
   Widget _pillToggle() {
     return ToggleButtons(
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
         children: [
-          Text("Dirección"),
-          Text("Link"),
+          Padding(
+            padding: EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Text("Dirección"),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Text("Link"),
+          ),
         ],
         onPressed: (idx) {
           setState(() {
+            addressController.text = '';
             _isSelected[idx] = true;
             _isSelected[1-idx] = false;
           });
@@ -83,10 +90,6 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   }
 
   Widget _addressInput({bool link, controller, label, icon}) {
-    // FIXME: bug cuando se pega del clipboard
-    // if (link) {
-    //   _pasteLinkFromClipboard();
-    // }
     return Container(
       margin: const EdgeInsets.only(top: 30),
       height: 80,
@@ -105,6 +108,10 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           ),
           labelText: label,
           icon: Icon(icon),
+          suffixIcon: link ? IconButton(
+            icon: Icon(Icons.paste),
+            onPressed: _pasteLinkFromClipboard,
+          ) : null,
         ),
         onTap: !link ? _displaySuggestions : null,
       ),
@@ -203,14 +210,16 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
       height: 80,
       child: TextFormField(
         controller: controller,
-        validator: (value) {
+        validator: (String value) {
+          String tempLabel = label.toString().toLowerCase();
           if (value.isEmpty) {
-            String tempLabel = label.toString().toLowerCase();
             return 'Por favor, ingrese el $tempLabel';
           }
           else if (value.length != 9) {
-            String tempLabel = label.toString().toLowerCase();
             return 'El $tempLabel debe tener 9 dígitos';
+          }
+          else if (value[0] != '9') {
+            return 'El $tempLabel debe ser un número válido';
           }
           return null;
         },
@@ -252,7 +261,12 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           onPressed: () {
             if (_formKey.currentState.validate()) {
               LoaderService.setIsLoading(message: "Guardando pedido...", waiting: true, context: context);
-              DeliveryRequest delivery = DeliveryRequest(address: addressController.text, latitude: finalAddress.result.geometry.location.lat, longitude: finalAddress.result.geometry.location.lng, receiver: clientController.text, phone: int.parse(phoneController.text));
+              DeliveryRequest delivery;
+              if (_isSelected[1]) {
+                delivery = DeliveryRequest(address: '', link: addressController.text, receiver: clientController.text, phone: int.parse(phoneController.text));
+              } else {
+                delivery = DeliveryRequest(address: addressController.text, link: '', latitude: finalAddress.result.geometry.location.lat, longitude: finalAddress.result.geometry.location.lng, receiver: clientController.text, phone: int.parse(phoneController.text));
+              }
               print("Delivery: ${delivery.toJson()}");
               ClientService.postDelivery(
                 delivery.toJson()
@@ -260,6 +274,14 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
                 print('Code: ${res.statusCode} Body: ${res.body}');
                 if (res.statusCode == 200) {
                   final body = jsonDecode(res.body);
+
+                  if (body['success'] == false) {
+                    Navigator.of(context).pop();
+                    DialogService.mostrarAlert(context: context, title: 'No se pudo guardar el pedido', subtitle: body['message']);
+                    addressController.text = '';
+                    return;
+                  }
+
                   print("Body del nuevo pedido: $body");
                   EventsService.emitter.emit("refreshDeliveries");
                   Navigator.popUntil(context, (route) => route.settings.name == "deliveries");

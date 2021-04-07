@@ -27,7 +27,7 @@ class _MapViewPageState extends State<MapViewPage> {
       ),
       body: Container(
         child: PhotoView(
-          imageProvider: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&markers=color:red%7C$lat,$lng&zoom=16&size=2000x2000&key=AIzaSyCw0h5QGQWJSHiY4L289Og34FRlWdltZlo'),
+          imageProvider: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&markers=color:red%7C$lat,$lng&zoom=16&size=2000x2000&key=AIzaSyDszjoQPzSF_ddL2pXODJy2nwZoT2IfYGI'),
         ),
       ),
       floatingActionButton: _viewOnMaps(lat: lat, lng: lng),

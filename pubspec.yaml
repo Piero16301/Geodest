@@ -51,6 +51,7 @@ dependencies:
   flutter_sms: ^1.1.0                      # Android | iOS
   whatsapp_unilink: ^1.0.0+1               # Android | iOS | Web | Linux | MacOS | Windows
   clipboard: ^0.1.3
+  share: ^2.0.1                            # Android | iOS
 
 dev_dependencies:
   flutter_test:

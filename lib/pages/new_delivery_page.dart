@@ -13,6 +13,8 @@ import 'package:geodest/services/events_service.dart';
 import 'package:geodest/services/loader_service.dart';
 import 'package:geodest/utils/colors.dart';
 
+import 'package:clipboard/clipboard.dart';
+
 class NewDeliveryPage extends StatefulWidget {
   @override
   _NewDeliveryPageState createState() => _NewDeliveryPageState();
@@ -20,6 +22,7 @@ class NewDeliveryPage extends StatefulWidget {
 
 class _NewDeliveryPageState extends State<NewDeliveryPage> {
   final addressController = TextEditingController();
+  final linkController = TextEditingController();
   final clientController = TextEditingController();
   final phoneController = TextEditingController();
 
@@ -28,24 +31,29 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  List<bool> _isSelected = [true, false];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Nuevo pedido"),
+        title: const Text("Nuevo pedido"),
         backgroundColor: primaryColor,
       ),
       body: Container(
-        margin: EdgeInsets.only(left: 20, right: 20),
+        margin: const EdgeInsets.only(left: 20, right: 20),
         child: ListView(
           children: [
             Form(
               key: _formKey,
               child: Column(
                 children: [
-                  _addressInput(controller: addressController, label: "Dirección del comprador", icon: Icons.home),
+                  // FIXME: _addressInput y _pillToggle deberían ser un solo stateful widget, esto hace que sea más rápida la aplicación
+                  if (_isSelected[0]) _addressInput(link: false, controller: addressController, label: "Dirección del comprador", icon: Icons.home),
+                  if (_isSelected[1]) _addressInput(link: true, controller: linkController, label: "Link de la dirección del comprador", icon: Icons.home),
+                  _pillToggle(),
                   _clientInput(controller: clientController, label: "Nombre del comprador", icon: Icons.person),
                   _phoneInput(controller: phoneController, label: "Celular del comprador", icon: Icons.phone_android),
                   _createNewDelivery(),
@@ -58,9 +66,29 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
     );
   }
 
-  Widget _addressInput({controller, label, icon}) {
+  Widget _pillToggle() {
+    return ToggleButtons(
+        children: [
+          Text("Dirección"),
+          Text("Link"),
+        ],
+        onPressed: (idx) {
+          setState(() {
+            _isSelected[idx] = true;
+            _isSelected[1-idx] = false;
+          });
+        },
+        isSelected: _isSelected
+    );
+  }
+
+  Widget _addressInput({bool link, controller, label, icon}) {
+    // FIXME: bug cuando se pega del clipboard
+    // if (link) {
+    //   _pasteLinkFromClipboard();
+    // }
     return Container(
-      margin: EdgeInsets.only(top: 30),
+      margin: const EdgeInsets.only(top: 30),
       height: 80,
       child: TextFormField(
         controller: controller,
@@ -78,8 +106,19 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           labelText: label,
           icon: Icon(icon),
         ),
-        onTap: _displaySuggestions,
+        onTap: !link ? _displaySuggestions : null,
       ),
+    );
+  }
+
+  void _pasteLinkFromClipboard() {
+    FlutterClipboard.paste().then(
+      (clipboardValue) {
+        setState(() {
+          addressController.text = clipboardValue;
+          print("clipboardValue: $clipboardValue");
+        });
+      }
     );
   }
 
@@ -132,7 +171,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
 
   Widget _clientInput({controller, label, icon}) {
     return Container(
-      margin: EdgeInsets.only(top: 30),
+      margin: const EdgeInsets.only(top: 30),
       height: 80,
       child: TextFormField(
         controller: controller,
@@ -160,7 +199,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
 
   Widget _phoneInput({controller, label, icon}) {
     return Container(
-      margin: EdgeInsets.only(top: 30),
+      margin: const EdgeInsets.only(top: 30),
       height: 80,
       child: TextFormField(
         controller: controller,
@@ -192,12 +231,12 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
 
   Widget _createNewDelivery() {
     return Container(
-      margin: EdgeInsets.only(top: 50),
+      margin: const EdgeInsets.only(top: 50),
       child: SizedBox(
         width: double.infinity,
         height: 40,
         child: ElevatedButton(
-          child: Text(
+          child: const Text(
             "REGISTRAR PEDIDO",
             style: TextStyle(
               fontSize: 15,

@@ -1,8 +1,14 @@
+import 'dart:convert';
+
+import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
+import 'package:geodest/enums/delivery_state.dart';
 
 import 'package:geodest/models/delivery_response.dart';
+import 'package:geodest/models/start_end_trip.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/services/dialog_service.dart';
+import 'package:geodest/services/location_service.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_unilink/whatsapp_unilink.dart';
@@ -15,6 +21,9 @@ class DeliveryDetailsPage extends StatefulWidget {
 class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
 
   DeliveryResponse deliveryResponse;
+  String buttonText = 'Iniciar viaje';
+  IconData buttonIcon = Icons.flag;
+  Color buttonColor = ternaryColor;
 
   @override
   Widget build(BuildContext context) {
@@ -114,13 +123,68 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
 
   Widget _finishDelivery() {
     return FloatingActionButton.extended(
-      label: Text('Finalizar'),
-      icon: Icon(Icons.check),
-      backgroundColor: primaryColor,
+      label: Text(buttonText),
+      icon: Icon(buttonIcon),
+      backgroundColor: buttonColor,
       onPressed: () {
         print("Finalizar delivery");
-        _confirmFinishDelivery(context);
+        if (buttonText == 'Iniciar viaje') {
+          _confirmStartDelivery(context);
+        } else {
+          _confirmFinishDelivery(context);
+        }
       },
+    );
+  }
+
+  void _confirmStartDelivery(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            title: Text("¿Seguro que quieres iniciar el viaje?"),
+            actions: [
+              TextButton(
+                child: Text('Sí'),
+                onPressed: () {
+                  int pk = deliveryResponse.pk;
+                  //TODO: Obtener la ubicación del repartidor para armar el JSON
+                  StartEndTrip startEndTrip = StartEndTrip(state: DeliveryState.Begin, bikerLat: -12.130817, bikerLng: -77.029850);
+                  print("Pk: $pk JSON: ${startEndTrip.toJson()}");
+                  ClientService.changeDeliveryState(deliveryId: pk, body: startEndTrip.toJson()).then((res) async {
+                    if (res.statusCode == 200) {
+                      final body = jsonDecode(res.body);
+                      if (body['success'] == false) {
+                        Navigator.of(ctx).pop();
+                        DialogService.mostrarAlert(context: context, title: 'No se pudo iniciar el viaje', subtitle: 'Compruebe los permisos de ubicación en inténtelo nuevamente.');
+                        return;
+                      }
+                      Navigator.of(ctx).pop();
+                      //TODO: esto reenviar al websocket
+                      final tiempoLlegada = body['ETA'];
+                      print("Start trip response: ${res.body}");
+                    } else {
+                      Navigator.of(context).pop();
+                      DialogService.mostrarAlert(context: context, title: 'No se pudo iniciar el viaje', subtitle: 'Compruebe los permisos de ubicación en inténtelo nuevamente.');
+                    }
+                  });
+                  setState(() {
+                    buttonText = 'Finalizar viaje';
+                    buttonIcon = Icons.check;
+                    buttonColor = primaryColor;
+                  });
+                },
+              ),
+              TextButton(
+                child: Text("No"),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            ],
+          );
+        }
     );
   }
 
@@ -130,7 +194,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         builder: (BuildContext ctx) {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            title: Text("¿Seguro que quieres finalizar el pedido?"),
+            title: Text("¿Seguro que quieres finalizar el viaje?"),
             actions: [
               TextButton(
                 child: Text("Sí"),

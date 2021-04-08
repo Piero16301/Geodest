@@ -107,11 +107,11 @@ class ClientService {
   /// iniciar/terminar viaje
   static Future<http.Response> changeDeliveryState({int deliveryId, Map<String, dynamic> body}) async {
     return await _client.put(
-      Uri.parse(CommonService.deliveryUrl + '/$deliveryId'),
+      Uri.parse(CommonService.deliveryUrl + '/$deliveryId/'),
       headers: <String, String> {
         'Content-Type': 'application/json'
       },
-      body: body,
+      body: jsonEncode(body),
     );
   }
 

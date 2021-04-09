@@ -4,6 +4,7 @@ import 'package:http_interceptor/http_client_with_interceptor.dart';
 import 'package:http/http.dart' as http show Response;
 
 import 'package:geodest/services/storage_service.dart';
+import 'package:web_socket_channel/io.dart';
 
 import '../interceptor/http_interceptor.dart';
 import './common_service.dart';
@@ -68,6 +69,19 @@ class ClientService {
       },
       body: jsonEncode(body),
     );
+  }
+
+  /// enviar ETA al websocket
+  static void sendEtaToWebsocket({String username, Map<String, dynamic> body}) {
+    IOWebSocketChannel channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
+
+    channel.stream.listen((event) {
+      print("WS response: $event");
+    });
+
+    channel.sink.add(jsonEncode(body));
+
+    channel.sink.close();
   }
 
   /// token

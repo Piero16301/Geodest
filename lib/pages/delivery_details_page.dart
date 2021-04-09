@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geodest/models/update_eta.dart';
+import 'package:geodest/services/storage_service.dart';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -159,6 +161,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       return;
                     }
                   }
+                  ///Se obtiene la posición actual de morotizado
                   Position currentPosition = await Geolocator.getCurrentPosition();
                   print("Posición actual: Lat ${currentPosition.latitude} Lng ${currentPosition.longitude}");
                   StartEndTrip startEndTrip = StartEndTrip(state: DeliveryState.Begin, bikerLat: currentPosition.latitude, bikerLng: currentPosition.longitude);
@@ -172,9 +175,14 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                         return;
                       }
                       Navigator.of(ctx).pop();
-                      //TODO: esto reenviar al websocket
+                      ///reenvio de ETA al websocket
                       final tiempoLlegada = body['ETA'];
                       print("Start trip response: ${res.body}");
+                      UpdateEta updateEta = UpdateEta(updateEta: true, pk: pk, eta: tiempoLlegada, lat: currentPosition.latitude, lng: currentPosition.longitude);
+                      String username = await StorageService.getUsername();
+                      print("Username: $username");
+                      print("Envío ETA al websocket");
+                      ClientService.sendEtaToWebsocket(username: username, body: updateEta.toJson());
                     } else {
                       Navigator.of(context).pop();
                       DialogService.mostrarAlert(context: context, title: 'Error de conexión con el servidor', subtitle: 'Compruebe su conexión e inténtelo nuevamente.');
@@ -211,7 +219,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                 child: Text("Sí"),
                 onPressed: () {
                   int pk = deliveryResponse.pk;
-                  StartEndTrip startEndTrip = StartEndTrip(state: 3);
+                  StartEndTrip startEndTrip = StartEndTrip(state: DeliveryState.End);
                   ClientService.completeDelivery(id: pk, body: startEndTrip.toJson()).then((res) async {
                     //TODO: feedback cuando
                     if (res.statusCode == 200) {

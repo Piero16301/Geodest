@@ -1,15 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:geodest/enums/delivery_state.dart';
 
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
+
+import 'package:geodest/enums/delivery_state.dart';
 import 'package:geodest/models/delivery_response.dart';
 import 'package:geodest/models/start_end_trip.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/services/dialog_service.dart';
 import 'package:geodest/utils/colors.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 class DeliveryDetailsPage extends StatefulWidget {
   @override
@@ -145,10 +147,21 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
             actions: [
               TextButton(
                 child: const Text('Sí'),
-                onPressed: () {
+                onPressed: () async {
                   int pk = deliveryResponse.pk;
-                  //TODO: Obtener la ubicación del repartidor para armar el JSON
-                  StartEndTrip startEndTrip = StartEndTrip(state: DeliveryState.Begin, bikerLat: -12.130817, bikerLng: -77.029850);
+                  LocationPermission permission;
+                  permission = await Geolocator.checkPermission();
+                  if (permission == LocationPermission.denied) {
+                    permission = await Geolocator.requestPermission();
+                    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+                      Navigator.of(ctx).pop();
+                      DialogService.mostrarAlert(context: context, title: 'No se puede acceder a tu ubicación', subtitle: 'Es necesario habilitar los permisos de ubicación para la aplicación.');
+                      return;
+                    }
+                  }
+                  Position currentPosition = await Geolocator.getCurrentPosition();
+                  print("Posición actual: Lat ${currentPosition.latitude} Lng ${currentPosition.longitude}");
+                  StartEndTrip startEndTrip = StartEndTrip(state: DeliveryState.Begin, bikerLat: currentPosition.latitude, bikerLng: currentPosition.longitude);
                   print("Pk: $pk JSON: ${startEndTrip.toJson()}");
                   ClientService.changeDeliveryState(deliveryId: pk, body: startEndTrip.toJson()).then((res) async {
                     if (res.statusCode == 200) {
@@ -164,7 +177,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       print("Start trip response: ${res.body}");
                     } else {
                       Navigator.of(context).pop();
-                      DialogService.mostrarAlert(context: context, title: 'No se pudo iniciar el viaje', subtitle: 'Compruebe los permisos de ubicación en inténtelo nuevamente.');
+                      DialogService.mostrarAlert(context: context, title: 'Error de conexión con el servidor', subtitle: 'Compruebe su conexión e inténtelo nuevamente.');
                     }
                   });
                   setState(() {
@@ -198,7 +211,8 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                 child: Text("Sí"),
                 onPressed: () {
                   int pk = deliveryResponse.pk;
-                  ClientService.completeDelivery(pk).then((res) async {
+                  StartEndTrip startEndTrip = StartEndTrip(state: 3);
+                  ClientService.completeDelivery(id: pk, body: startEndTrip.toJson()).then((res) async {
                     //TODO: feedback cuando
                     if (res.statusCode == 200) {
                       print("Pedido marcado como completado");

@@ -49,12 +49,24 @@ class ClientService {
     );
   }
 
-  static Future<http.Response> completeDelivery(int id) async {
+  static Future<http.Response> completeDelivery({int id, Map<String, dynamic> body}) async {
     return await _client.put(
-        Uri.parse("${CommonService.deliveryUrl}/$id/"),
-        headers: <String, String> {
-          'Content-Type': 'application/json'
-        }
+      Uri.parse("${CommonService.deliveryUrl}/$id/"),
+      headers: <String, String> {
+        'Content-Type': 'application/json'
+      },
+      body: jsonEncode(body),
+    );
+  }
+
+  /// iniciar/terminar viaje
+  static Future<http.Response> changeDeliveryState({int deliveryId, Map<String, dynamic> body}) async {
+    return await _client.put(
+      Uri.parse(CommonService.deliveryUrl + '/$deliveryId/'),
+      headers: <String, String> {
+        'Content-Type': 'application/json'
+      },
+      body: jsonEncode(body),
     );
   }
 
@@ -101,17 +113,6 @@ class ClientService {
         'Content-Type': 'application/json'
       },
       body: body,
-    );
-  }
-
-  /// iniciar/terminar viaje
-  static Future<http.Response> changeDeliveryState({int deliveryId, Map<String, dynamic> body}) async {
-    return await _client.put(
-      Uri.parse(CommonService.deliveryUrl + '/$deliveryId/'),
-      headers: <String, String> {
-        'Content-Type': 'application/json'
-      },
-      body: jsonEncode(body),
     );
   }
 

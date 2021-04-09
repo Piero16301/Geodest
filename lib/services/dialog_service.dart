@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sms/flutter_sms.dart';
+import 'package:system_settings/system_settings.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
@@ -35,6 +35,29 @@ class DialogService {
             ],
           );
         }
+    );
+  }
+
+  static complainContactsPermissionDenied(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text("¡Necesitamos tu permiso!"),
+          content: const Text("Para que puedas elegir el número del cliente más fácilmente. Por favor, anda a Ajustes y cambia los permisos."),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  SystemSettings.app();
+                },
+                child: const Text("OK")
+            )
+          ],
+          elevation: 30.0,
+        );
+      },
+      barrierDismissible: false,
     );
   }
 

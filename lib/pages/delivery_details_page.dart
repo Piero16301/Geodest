@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
 import 'package:geodest/enums/delivery_state.dart';
 
@@ -8,7 +7,6 @@ import 'package:geodest/models/delivery_response.dart';
 import 'package:geodest/models/start_end_trip.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/services/dialog_service.dart';
-import 'package:geodest/services/location_service.dart';
 import 'package:geodest/utils/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_unilink/whatsapp_unilink.dart';
@@ -33,11 +31,11 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Detalles del pedido"),
+        title: const Text("Detalles del pedido"),
         backgroundColor: primaryColor,
       ),
       body: Container(
-        margin: EdgeInsets.only(left: 20, right: 20, top: 10),
+        margin: const EdgeInsets.only(left: 20, right: 20, top: 10),
         child: ListView(
           children: [
             Column(
@@ -92,7 +90,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
             child: Column(
               children: [
                 Container(height: 10),
-                Center(
+                const Center(
                   child: Text(
                     "Ubicación del destino",
                     style: TextStyle(
@@ -143,10 +141,10 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         builder: (BuildContext ctx) {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-            title: Text("¿Seguro que quieres iniciar el viaje?"),
+            title: const Text("¿Seguro que quieres iniciar el viaje?"),
             actions: [
               TextButton(
-                child: Text('Sí'),
+                child: const Text('Sí'),
                 onPressed: () {
                   int pk = deliveryResponse.pk;
                   //TODO: Obtener la ubicación del repartidor para armar el JSON
@@ -177,7 +175,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                 },
               ),
               TextButton(
-                child: Text("No"),
+                child: const Text("No"),
                 onPressed: () {
                   Navigator.of(ctx).pop();
                 },

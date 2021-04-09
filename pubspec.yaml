@@ -52,6 +52,8 @@ dependencies:
   whatsapp_unilink: ^1.0.0+1               # Android | iOS | Web | Linux | MacOS | Windows
   clipboard: ^0.1.3                        # Android | iOS | Web | Linux | MacOS | Windows
   share: ^2.0.1                            # Android | iOS
+  contacts_service: ^0.6.0
+  permission_handler: ^5.0.1+1             # no se puede poner la versión 6 xq background_location depende de esta versión
 
 dev_dependencies:
   flutter_test:

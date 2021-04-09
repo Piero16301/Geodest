@@ -53,5 +53,7 @@
 	<false/>
 	<key>allowsBackgroundLocationUpdates</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+    <string>Lo necesitamos para que elijas en número del cliente más fácilmente.</string>
 </dict>
 </plist>

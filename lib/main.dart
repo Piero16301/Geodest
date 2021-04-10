@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:geodest/pages/delivery_details_page.dart';
 import 'package:geodest/pages/map_view_page.dart';
 import 'package:geodest/services/navigation_service.dart';
+import 'package:geodest/services/user_preferences.dart';
 
 import './pages/deliveries_page.dart';
 import './pages/login_page.dart';
 import './pages/splash_page.dart';
 import './pages/new_delivery_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final preferences = new PreferenciasUsuario();
+  await preferences.initPreferences();
+
   runApp(MyApp());
 }
 

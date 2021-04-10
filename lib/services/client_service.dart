@@ -74,6 +74,7 @@ class ClientService {
   /// enviar ETA al websocket
   static void sendEtaToWebsocket({String username, Map<String, dynamic> body}) {
     IOWebSocketChannel channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
+    print("${CommonService.wsBaseUrl}/$username/");
 
     channel.stream.listen((event) {
       print("WS response: $event");

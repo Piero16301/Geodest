@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:geodest/models/update_eta.dart';
-import 'package:geodest/services/storage_service.dart';
+import 'package:geodest/services/user_preferences.dart';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_unilink/whatsapp_unilink.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:geodest/enums/delivery_state.dart';
 import 'package:geodest/models/delivery_response.dart';
@@ -14,6 +14,8 @@ import 'package:geodest/models/start_end_trip.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geodest/services/dialog_service.dart';
 import 'package:geodest/utils/colors.dart';
+import 'package:geodest/models/update_eta.dart';
+import 'package:geodest/services/storage_service.dart';
 
 class DeliveryDetailsPage extends StatefulWidget {
   @override
@@ -23,14 +25,27 @@ class DeliveryDetailsPage extends StatefulWidget {
 class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
 
   DeliveryResponse deliveryResponse;
-  String buttonText = 'Iniciar viaje';
-  IconData buttonIcon = Icons.flag;
-  Color buttonColor = ternaryColor;
+
+  String buttonText;
+  IconData buttonIcon;
+  Color buttonColor;
+
+  final preferences = new PreferenciasUsuario();
 
   @override
   Widget build(BuildContext context) {
 
     deliveryResponse = ModalRoute.of(context).settings.arguments;
+    print("Pedido: ${deliveryResponse.toJson()}");
+    if (preferences.getDeliveryStarted() == deliveryResponse.pk) {
+      buttonText = 'Finalizar viaje';
+      buttonIcon = Icons.check;
+      buttonColor = primaryColor;
+    } else {
+      buttonText = 'Iniciar viaje';
+      buttonIcon = Icons.flag;
+      buttonColor = ternaryColor;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -180,18 +195,32 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       print("Start trip response: ${res.body}");
                       UpdateEta updateEta = UpdateEta(updateEta: true, pk: pk, eta: tiempoLlegada, lat: currentPosition.latitude, lng: currentPosition.longitude);
                       String username = await StorageService.getUsername();
+                      if (username.isEmpty) {
+                        http.Response res = await ClientService.getUsername();
+                        if (res.statusCode == 200) {
+                          final body = jsonDecode(res.body);
+                          username = body['username'];
+                          await StorageService.saveUsername(username);
+                        } else {
+                          print("[ERROR]: when fetching username");
+                          return;
+                        }
+                      }
                       print("Username: $username");
                       print("Envío ETA al websocket");
+                      print(updateEta.toJson());
                       ClientService.sendEtaToWebsocket(username: username, body: updateEta.toJson());
+                      DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "El viaje se ha iniciado.");
+                      preferences.saveDeliveryStarted(pk);
+                      setState(() {
+                        buttonText = 'Finalizar viaje';
+                        buttonIcon = Icons.check;
+                        buttonColor = primaryColor;
+                      });
                     } else {
                       Navigator.of(context).pop();
                       DialogService.mostrarAlert(context: context, title: 'Error de conexión con el servidor', subtitle: 'Compruebe su conexión e inténtelo nuevamente.');
                     }
-                  });
-                  setState(() {
-                    buttonText = 'Finalizar viaje';
-                    buttonIcon = Icons.check;
-                    buttonColor = primaryColor;
                   });
                 },
               ),
@@ -234,6 +263,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       );
                       await launch('$whatsAppLink');
                       DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "El pedido se ha finalizado.", popUntilDeliveriesPage: true);
+                      preferences.removeDeliveryStarted();
                     } else {
                       print("Error en marcar pedido como completado, intentar de nuevo");
                       //TODO: se tiene que meterle dismiss a este dialog

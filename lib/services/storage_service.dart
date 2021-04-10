@@ -87,6 +87,23 @@ class StorageService {
     await prefs.remove('username');
   }
 
+  /// delivery started
+
+  static Future<void> saveDeliveryStarted(int deliveryId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.setInt('deliveryStarted', deliveryId);
+  }
+
+  static Future<int> getDeliveryStarted() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('deliveryStarted') ?? 0;
+  }
+
+  static Future<void> removeDeliveryStarted() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('deliveryStarted');
+  }
+
   /// logout
   static Future<void> logout() async {
     await removeAccessToken();

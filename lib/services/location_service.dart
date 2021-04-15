@@ -15,7 +15,9 @@ import './client_service.dart';
 
 class LocationService {
 
-  static IOWebSocketChannel channel;
+  static IOWebSocketChannel _channel;
+
+  static bool isSharingLocation;
 
   static start() async {
     print("Compartiendo ubicación...");
@@ -38,10 +40,10 @@ class LocationService {
 
     print("WEBSOCKET: ${CommonService.wsBaseUrl}/$username/");
 
-    channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
+    _channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
 
     /// lo de abajo es para debugging
-    channel.stream.listen((event) {
+    _channel.stream.listen((event) {
       print("WS response: $event");
     });
 
@@ -51,8 +53,7 @@ class LocationService {
       icon: "@mipmap/ic_launcher",
     );
     BackgroundLocation.setAndroidConfiguration(10000);
-    //TODO: descomentar lo de abajo antes del deploy
-    BackgroundLocation.startLocationService(distanceFilter: 0);
+    BackgroundLocation.startLocationService(distanceFilter: 50);
     BackgroundLocation.startLocationService();
   }
 
@@ -63,10 +64,12 @@ class LocationService {
       await LocationService.start();
 
       BackgroundLocation.getLocationUpdates((Location location) {
+        isSharingLocation = true;
         //TODO: connect again to socket
-        print("channel: $channel");
+        print("channel: $_channel");
         print("Location update at ${DateTime.now()}: (lat: ${location.latitude}, long: ${location.longitude})");
         sendLocation(location);
+        isSharingLocation = false;
       });
       return true;
     } else {
@@ -87,7 +90,7 @@ class LocationService {
     bool isMock;
   */
   static sendLocation(Location location) {
-    channel.sink.add(
+    _channel.sink.add(
       jsonEncode({
         'message': jsonEncode({
           'lat': location.latitude,
@@ -99,9 +102,10 @@ class LocationService {
 
   static stop() async {
     print("Dejando de compartir ubicación...");
-    channel.sink.close();
-    BackgroundLocation.stopLocationService();
-    // await StorageService.removeUsername();
+    if (_channel != null) {
+      _channel.sink.close();
+      BackgroundLocation.stopLocationService();
+    }
     await StorageService.saveIsSharingLocation(false);
   }
 
@@ -116,7 +120,6 @@ class LocationService {
             TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  //FIXME: lo de abajo no funca
                   SystemSettings.app();
                 },
                 child: const Text("OK")

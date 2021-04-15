@@ -18,9 +18,6 @@ void isolate1(String arg) async  {
 
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
-  // final preferences = new PreferenciasUsuario();
-  // await preferences.initPreferences();
-  //
   // final isolate = await FlutterIsolate.spawn(isolate1, "hello");
 
   runApp(MyApp());

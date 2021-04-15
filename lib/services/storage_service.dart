@@ -1,3 +1,4 @@
+import 'package:geodest/services/location_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageService {
@@ -106,11 +107,16 @@ class StorageService {
 
   /// logout
   static Future<void> logout() async {
+    final bool isSharingLocation = await StorageService.getIsSharingLocation();
+
+    if (isSharingLocation) {
+      LocationService.stop();
+    }
+
     await removeAccessToken();
     await removeRefreshToken();
     await removeIsSharingLocation();
     await removeUsername();
-    /// FIXME: asumo que no esta compartiendo ubicacion cuando hace logout
   }
 
 }

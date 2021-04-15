@@ -32,8 +32,13 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
+    _checkIsSharingLocation().then((reload) {
+      if (reload) {
+        setState(() {});
+      }
+    });
 
     StorageService.getIsSharingLocation().then((isSharing) {
       if (isSharing) {
@@ -49,6 +54,16 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       }
     });
 
+  }
+
+  Future<bool> _checkIsSharingLocation() async {
+    bool isSharingLocation = await StorageService.getIsSharingLocation();
+    //TODO: debug
+    if (isSharingLocation && LocationService.isSharingLocation == null) {
+      LocationService.stop();
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -80,9 +95,6 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
 
   SpeedDialChild _dialChild({action, context, icon, color, label, route}) {
 
-    // final uiProvider = Provider.of<UiProvider>(context);
-    // final currentIndex = uiProvider.selectedMenuOpt;
-
     return SpeedDialChild(
       child: icon,
       backgroundColor: color,
@@ -99,17 +111,13 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       onTap: () {
         switch (action) {
           case SpeedDialAction.RefreshDeliveries: {
-            //TODO: mandarle un evento a DeliveriesPage para q refresque
             print("Refresh deliveries");
 
-            // uiProvider.selectedMenuOpt = 1;
             EventsService.emitter.emit("refreshDeliveries");
 
             break;
           }
           case SpeedDialAction.ShowCreditInfo: {
-            //TODO: hacer request
-            //TODO: mandarle la data del responde al dialog
             ClientService.getCreditInfo().then(
               (res) {
                 final body = jsonDecode(res.body);
@@ -147,7 +155,6 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             break;
           }
           case SpeedDialAction.AddDelivery: {
-            //TODO: pushear la vista de añadir delivery
             Navigator.pushNamed(context, 'new_delivery');
             break;
           }

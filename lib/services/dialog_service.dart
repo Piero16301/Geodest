@@ -86,7 +86,7 @@ class DialogService {
                         ),
                         TextSpan(
                           text: '$remainingCredits\n',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                           ),
                         ),

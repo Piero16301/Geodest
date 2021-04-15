@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -43,13 +44,13 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
 
   @override
   void initState() {
+    super.initState();
     EventsService.emitter.on("refreshDeliveries", context, (ev, context) {
       print("refresco de deliveries");
       if (this.mounted) {
         setState(() {});
       }
     });
-    super.initState();
   }
 
   @override
@@ -64,19 +65,19 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         automaticallyImplyLeading: false,
       ),
       body: Container(
-        margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+        margin: const EdgeInsets.only(left: 20, right: 20),
         child: FutureBuilder(
           future: obtainDeliveries(),
           builder: (BuildContext ctx, AsyncSnapshot<List<DeliveryResponse>> snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
                 itemCount: snapshot.data.length,
+                padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                 itemBuilder: (BuildContext ctx, int idx) {
                   return _deliveryCard(snapshot: snapshot, idx: idx);
                 },
               );
             } else if (snapshot.hasError) {
-              //TODO: retry request
               return const Padding(
                 padding: EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0),
                 child: Text(

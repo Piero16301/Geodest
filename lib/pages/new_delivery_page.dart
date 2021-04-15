@@ -52,6 +52,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
       ),
       body: Container(
         margin: const EdgeInsets.only(left: 20, right: 20),
+        padding: const EdgeInsets.only(bottom: 20.0),
         child: ListView(
           children: [
             Form(
@@ -264,6 +265,18 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
     }
   }
 
+  String removeAllSpaces({String fromString, String replaceSpaceBy}) {
+    if (fromString == null) {
+      return null;
+    }
+
+    // This pattern means "at least one space, or more"
+    // \\s : space
+    // +   : one or more
+    final pattern = RegExp('\\s+');
+    return fromString.replaceAll(pattern, replaceSpaceBy);
+  }
+
   Future<void> _pickContact() async {
     try {
       final Contact contact = await ContactsService.openDeviceContactPicker(
@@ -277,6 +290,8 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
         if (phoneNumber.substring(0, 3) == "+51") {
           phoneNumber = phoneNumber.substring(3);
         }
+        //FIXME: probar
+        phoneNumber = removeAllSpaces(fromString: phoneNumber, replaceSpaceBy: '');
         phoneController.text = phoneNumber;
         print("contact: ${contact.phones.elementAt(0).value}");
       });

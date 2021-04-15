@@ -54,8 +54,9 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         backgroundColor: primaryColor,
       ),
       body: Container(
-        margin: const EdgeInsets.only(left: 20, right: 20, top: 10),
+        margin: const EdgeInsets.only(left: 20, right: 20),
         child: ListView(
+          padding: const EdgeInsets.only(top: 10, bottom: 20),
           children: [
             Column(
               children: [
@@ -84,7 +85,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
               children: [
                 ListTile(
                   leading: Icon(icon),
-                  title: Text(data),
+                  title: SelectableText(data),
                   subtitle: Text(field),
                   onTap: () {},
                 ),

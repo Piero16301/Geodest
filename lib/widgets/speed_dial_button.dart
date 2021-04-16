@@ -25,8 +25,6 @@ class SpeedDialButton extends StatefulWidget {
 
 }
 
-//TODO: convertir a un staeful widget
-//TODO: darle un feedback al usuario para que se note que está compartiendo ubicación
 class _SpeedDialButtonState extends State<SpeedDialButton> {
 
   Icon shareLocationIcon;
@@ -37,36 +35,33 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
   void initState() {
     super.initState();
 
-    _checkIsSharingLocation().then((reload) {
-      if (reload) {
-        setState(() {});
-      }
-    });
-
-    StorageService.getIsSharingLocation().then((isSharing) {
+    _checkIsSharingLocation().then((isSharing) {
       if (isSharing) {
         shareLocationIcon = Icon(Icons.location_off);
         shareLocationColor = Colors.red;
         shareLocationText = "Dejar de compartir";
-        setState(() {});
       } else {
         shareLocationIcon = Icon(Icons.location_on);
         shareLocationColor = Colors.amber;
         shareLocationText = "Compartir ubicación";
-        setState(() {});
       }
+      setState(() {});
     });
-
   }
 
   Future<bool> _checkIsSharingLocation() async {
     bool isSharingLocation = await StorageService.getIsSharingLocation();
-    //TODO: debug
-    if (isSharingLocation && LocationService.isSharingLocation == null) {
-      LocationService.stop();
+    print("isSharingLocation: $isSharingLocation");
+    print("LocationService.isSharingLocation: ${LocationService.isSharingLocation}");
+    if (isSharingLocation) { /// deberia estar compartiendo ubicacion
+      if (LocationService.isSharingLocation == null) { /// cerró la app, mientras compartia
+        await LocationService.toggleLocationSharing(start: true);
+      }
       return true;
+    } else { /// no esta compartiendo ubicacion
+      return false;
     }
-    return false;
+
   }
 
   @override
@@ -117,12 +112,10 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       child: icon,
       backgroundColor: color,
       foregroundColor: Colors.white,
-      //labelBackgroundColor: Color(0xffF9D342),
       labelBackgroundColor: color,
       label: label,
       labelStyle: TextStyle(
         fontSize: 15,
-        //color: Color(0xff292826),
         color: Colors.white,
         fontWeight: FontWeight.bold,
       ),
@@ -130,9 +123,7 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
         switch (action) {
           case SpeedDialAction.RefreshDeliveries: {
             print("Refresh deliveries");
-
             EventsService.emitter.emit("refreshDeliveries");
-
             break;
           }
           case SpeedDialAction.ShowCreditInfo: {
@@ -189,9 +180,6 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             });
             print("logout");
             break;
-          }
-          default: {
-            // nica llega acá
           }
         }
       },

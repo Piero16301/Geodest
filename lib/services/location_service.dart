@@ -57,15 +57,14 @@ class LocationService {
     BackgroundLocation.startLocationService();
   }
 
-  static Future<bool> toggleLocationSharing() async {
+  static Future<bool> toggleLocationSharing({bool start = false}) async {
     bool isSharingLocation = await StorageService.getIsSharingLocation();
 
-    if (!isSharingLocation) {
+    if (!isSharingLocation || start) {
       await LocationService.start();
 
       BackgroundLocation.getLocationUpdates((Location location) {
         isSharingLocation = true;
-        //TODO: connect again to socket
         print("channel: $_channel");
         print("Location update at ${DateTime.now()}: (lat: ${location.latitude}, long: ${location.longitude})");
         sendLocation(location);

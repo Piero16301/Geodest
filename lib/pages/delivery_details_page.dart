@@ -166,63 +166,93 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
               TextButton(
                 child: const Text('Sí'),
                 onPressed: () async {
-                  int pk = deliveryResponse.pk;
-                  LocationPermission permission;
-                  permission = await Geolocator.checkPermission();
-                  if (permission == LocationPermission.denied) {
-                    permission = await Geolocator.requestPermission();
-                    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-                      Navigator.of(ctx).pop();
-                      DialogService.mostrarAlert(context: context, title: 'No se puede acceder a tu ubicación', subtitle: 'Es necesario habilitar los permisos de ubicación para la aplicación.');
-                      return;
-                    }
-                  }
-                  ///Se obtiene la posición actual de morotizado
-                  Position currentPosition = await Geolocator.getCurrentPosition();
-                  print("Posición actual: Lat ${currentPosition.latitude} Lng ${currentPosition.longitude}");
-                  StartEndTrip startEndTrip = StartEndTrip(state: DeliveryState.Begin, bikerLat: currentPosition.latitude, bikerLng: currentPosition.longitude);
-                  print("Pk: $pk JSON: ${startEndTrip.toJson()}");
-                  ClientService.changeDeliveryState(deliveryId: pk, body: startEndTrip.toJson()).then((res) async {
-                    if (res.statusCode == 200) {
-                      final body = jsonDecode(res.body);
-                      if (body['success'] == false) {
+                  if (preferences.getDeliveryStarted() != 0) {
+                    int pk = deliveryResponse.pk;
+                    LocationPermission permission;
+                    permission = await Geolocator.checkPermission();
+                    if (permission == LocationPermission.denied) {
+                      permission = await Geolocator.requestPermission();
+                      if (permission == LocationPermission.denied ||
+                          permission == LocationPermission.deniedForever) {
                         Navigator.of(ctx).pop();
-                        DialogService.mostrarAlert(context: context, title: 'No se pudo iniciar el viaje', subtitle: 'Compruebe los permisos de ubicación en inténtelo nuevamente.');
+                        DialogService.mostrarAlert(context: context,
+                            title: 'No se puede acceder a tu ubicación',
+                            subtitle: 'Es necesario habilitar los permisos de ubicación para la aplicación.');
                         return;
                       }
-                      Navigator.of(ctx).pop();
-                      ///reenvio de ETA al websocket
-                      final tiempoLlegada = body['ETA'];
-                      print("Start trip response: ${res.body}");
-                      UpdateEta updateEta = UpdateEta(updateEta: true, pk: pk, eta: tiempoLlegada, lat: currentPosition.latitude, lng: currentPosition.longitude);
-                      String username = await StorageService.getUsername();
-                      if (username.isEmpty) {
-                        http.Response res = await ClientService.getUsername();
-                        if (res.statusCode == 200) {
-                          final body = jsonDecode(res.body);
-                          username = body['username'];
-                          await StorageService.saveUsername(username);
-                        } else {
-                          print("[ERROR]: when fetching username");
+                    }
+
+                    ///Se obtiene la posición actual de morotizado
+                    Position currentPosition = await Geolocator
+                        .getCurrentPosition();
+                    print("Posición actual: Lat ${currentPosition
+                        .latitude} Lng ${currentPosition.longitude}");
+                    StartEndTrip startEndTrip = StartEndTrip(
+                        state: DeliveryState.Begin,
+                        bikerLat: currentPosition.latitude,
+                        bikerLng: currentPosition.longitude);
+                    print("Pk: $pk JSON: ${startEndTrip.toJson()}");
+                    ClientService.changeDeliveryState(
+                        deliveryId: pk, body: startEndTrip.toJson()).then((
+                        res) async {
+                      if (res.statusCode == 200) {
+                        final body = jsonDecode(res.body);
+                        if (body['success'] == false) {
+                          Navigator.of(ctx).pop();
+                          DialogService.mostrarAlert(context: context,
+                              title: 'No se pudo iniciar el viaje',
+                              subtitle: 'Compruebe los permisos de ubicación en inténtelo nuevamente.');
                           return;
                         }
+                        Navigator.of(ctx).pop();
+
+                        ///reenvio de ETA al websocket
+                        final tiempoLlegada = body['ETA'];
+                        print("Start trip response: ${res.body}");
+                        UpdateEta updateEta = UpdateEta(updateEta: true,
+                            pk: pk,
+                            eta: tiempoLlegada,
+                            lat: currentPosition.latitude,
+                            lng: currentPosition.longitude);
+                        String username = await StorageService.getUsername();
+                        if (username.isEmpty) {
+                          http.Response res = await ClientService.getUsername();
+                          if (res.statusCode == 200) {
+                            final body = jsonDecode(res.body);
+                            username = body['username'];
+                            await StorageService.saveUsername(username);
+                          } else {
+                            print("[ERROR]: when fetching username");
+                            return;
+                          }
+                        }
+                        print("Username: $username");
+                        print("Envío ETA al websocket");
+                        print(updateEta.toJson());
+                        ClientService.sendEtaToWebsocket(
+                            username: username, body: updateEta.toJson());
+                        DialogService.mostrarAlert(context: context,
+                            title: "Éxito",
+                            subtitle: "El viaje se ha iniciado.");
+                        preferences.saveDeliveryStarted(pk);
+                        setState(() {
+                          buttonText = 'Finalizar viaje';
+                          buttonIcon = Icons.check;
+                          buttonColor = primaryColor;
+                        });
+                      } else {
+                        Navigator.of(context).pop();
+                        DialogService.mostrarAlert(context: context,
+                            title: 'Error de conexión con el servidor',
+                            subtitle: 'Compruebe su conexión e inténtelo nuevamente.');
                       }
-                      print("Username: $username");
-                      print("Envío ETA al websocket");
-                      print(updateEta.toJson());
-                      ClientService.sendEtaToWebsocket(username: username, body: updateEta.toJson());
-                      DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "El viaje se ha iniciado.");
-                      preferences.saveDeliveryStarted(pk);
-                      setState(() {
-                        buttonText = 'Finalizar viaje';
-                        buttonIcon = Icons.check;
-                        buttonColor = primaryColor;
-                      });
-                    } else {
-                      Navigator.of(context).pop();
-                      DialogService.mostrarAlert(context: context, title: 'Error de conexión con el servidor', subtitle: 'Compruebe su conexión e inténtelo nuevamente.');
-                    }
-                  });
+                    });
+                  } else {
+                    Navigator.of(ctx).pop();
+                    DialogService.mostrarAlert(context: context,
+                        title: 'Ya existe un viaje en curso',
+                        subtitle: 'No puede iniciar dos viajes en simultáneo.');
+                  }
                 },
               ),
               TextButton(

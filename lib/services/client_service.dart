@@ -123,7 +123,7 @@ class ClientService {
   /// location update
   static Future<http.Response> updateLocation(Map<String, dynamic> body) async {
     return await _client.put(
-      Uri.parse(CommonService.locationUpdateUrl),
+      Uri.parse('${CommonService.locationUpdateUrl}/'),
       headers: <String, String> {
         'Content-Type': 'application/json'
       },

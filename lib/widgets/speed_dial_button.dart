@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_isolate/flutter_isolate.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:background_location/background_location.dart';
 import 'package:geodest/services/client_service.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:geodest/utils/colors.dart';
 
@@ -93,6 +96,21 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
     );
   }
 
+  void sendPutLocation(String arg) async {
+    Timer.periodic(Duration(seconds: 5), (timer) async {
+      ///Hacer el put al server
+      Position currentPosition = await Geolocator.getCurrentPosition();
+      final body = {
+        "lat": currentPosition.latitude,
+        "lng": currentPosition.longitude
+      };
+      print('Haciendo el PUT de la ubicación');
+      ClientService.updateLocation(body).then((response) {
+        print('Update response: ${json.decode(response.body)}');
+      });
+    });
+  }
+
   SpeedDialChild _dialChild({action, context, icon, color, label, route}) {
 
     return SpeedDialChild(
@@ -130,9 +148,13 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
           case SpeedDialAction.ShareLocation: {
             BackgroundLocation.getPermissions(
               onGranted: () {
-                LocationService.toggleLocationSharing().then((result) {
+                LocationService.toggleLocationSharing().then((result) async {
+                  final isolate = await FlutterIsolate.spawn(sendPutLocation, 'start_put_location');
                   if (result) {
                     /// empezó a compartir ubicación
+
+                    //isolate.startPutLocation(sendPutLocation);
+
                     setState(() {
                       shareLocationIcon = Icon(Icons.location_off);
                       shareLocationColor = Colors.red;
@@ -140,6 +162,9 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
                     });
                   } else {
                     /// dejó de compartir ubicación
+
+                    //isolate.finishPutLocation();
+
                     setState(() {
                       shareLocationIcon = Icon(Icons.location_on);
                       shareLocationColor = Colors.amber;

@@ -36,7 +36,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
   Widget build(BuildContext context) {
 
     deliveryResponse = ModalRoute.of(context).settings.arguments;
-    print("Pedido: ${deliveryResponse.toJson()}");
+    // print("Pedido: ${deliveryResponse.toJson()}");
     if (preferences.getDeliveryStarted() == deliveryResponse.pk) {
       buttonText = 'Finalizar viaje';
       buttonIcon = Icons.check;
@@ -145,7 +145,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
       icon: Icon(buttonIcon),
       backgroundColor: buttonColor,
       onPressed: () {
-        print("Finalizar delivery");
+        // print("Finalizar delivery");
         if (buttonText == 'Iniciar viaje') {
           _confirmStartDelivery(context);
         } else {
@@ -185,13 +185,13 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                     ///Se obtiene la posición actual de morotizado
                     Position currentPosition = await Geolocator
                         .getCurrentPosition();
-                    print("Posición actual: Lat ${currentPosition
-                        .latitude} Lng ${currentPosition.longitude}");
+                    // print("Posición actual: Lat ${currentPosition
+                    //    .latitude} Lng ${currentPosition.longitude}");
                     StartEndTrip startEndTrip = StartEndTrip(
                         state: DeliveryState.Begin,
                         bikerLat: currentPosition.latitude,
                         bikerLng: currentPosition.longitude);
-                    print("Pk: $pk JSON: ${startEndTrip.toJson()}");
+                    // print("Pk: $pk JSON: ${startEndTrip.toJson()}");
                     ClientService.changeDeliveryState(
                         deliveryId: pk, body: startEndTrip.toJson()).then((
                         res) async {
@@ -208,7 +208,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
 
                         ///reenvio de ETA al websocket
                         final tiempoLlegada = body['ETA'];
-                        print("Start trip response: ${res.body}");
+                        // print("Start trip response: ${res.body}");
                         UpdateEta updateEta = UpdateEta(updateEta: true,
                             pk: pk,
                             eta: tiempoLlegada,
@@ -222,13 +222,13 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                             username = body['username'];
                             await StorageService.saveUsername(username);
                           } else {
-                            print("[ERROR]: when fetching username");
+                            // print("[ERROR]: when fetching username");
                             return;
                           }
                         }
-                        print("Username: $username");
-                        print("Envío ETA al websocket");
-                        print(updateEta.toJson());
+                        // print("Username: $username");
+                        // print("Envío ETA al websocket");
+                        // print(updateEta.toJson());
                         ClientService.sendEtaToWebsocket(
                             username: username, body: updateEta.toJson());
                         DialogService.mostrarAlert(context: context,
@@ -283,7 +283,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                   ClientService.completeDelivery(id: pk, body: startEndTrip.toJson()).then((res) async {
                     //TODO: feedback cuando
                     if (res.statusCode == 200) {
-                      print("Pedido marcado como completado");
+                      // print("Pedido marcado como completado");
                       ///funciona pero da exception por alguna razon
                       Navigator.of(context).pop();
                       String number = "+51${deliveryResponse.phone}";
@@ -296,7 +296,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "El pedido se ha finalizado.", popUntilDeliveriesPage: true);
                       preferences.removeDeliveryStarted();
                     } else {
-                      print("Error en marcar pedido como completado, intentar de nuevo");
+                      // print("Error en marcar pedido como completado, intentar de nuevo");
                       //TODO: se tiene que meterle dismiss a este dialog
                       Navigator.of(context).pop();
                       DialogService.mostrarAlert(context: context, title: "Ups", subtitle: "Ocurrió un error. Por favor, inténtalo más tarde.");

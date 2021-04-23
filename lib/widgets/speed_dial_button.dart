@@ -50,8 +50,8 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
 
   Future<bool> _checkIsSharingLocation() async {
     bool isSharingLocation = await StorageService.getIsSharingLocation();
-    print("isSharingLocation: $isSharingLocation");
-    print("LocationService.isSharingLocation: ${LocationService.isSharingLocation}");
+    // print("isSharingLocation: $isSharingLocation");
+    // print("LocationService.isSharingLocation: ${LocationService.isSharingLocation}");
     if (isSharingLocation) { /// deberia estar compartiendo ubicacion
       if (LocationService.isSharingLocation == null) { /// cerró la app, mientras compartia
         await LocationService.toggleLocationSharing(start: true);
@@ -73,8 +73,8 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       activeIcon: Icons.remove,
       buttonSize: 60,
       overlayOpacity: 0.5,
-      onOpen: () => print('OPENING DIAL'),
-      onClose: () => print('DIAL CLOSED'),
+      onOpen: () => {},// print('OPENING DIAL'),
+      onClose: () => {}, // print('DIAL CLOSED'),
       backgroundColor: primaryColor,
       foregroundColor: Colors.white,
       elevation: 5,
@@ -98,9 +98,9 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
         "lat": currentPosition.latitude,
         "lng": currentPosition.longitude
       };
-      print('Haciendo el PUT de la ubicación');
+      // print('Haciendo el PUT de la ubicación');
       ClientService.updateLocation(body).then((response) {
-        print('Update response: ${json.decode(response.body)}');
+        // print('Update response: ${json.decode(response.body)}');
       });
     });
   }
@@ -121,7 +121,7 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       onTap: () {
         switch (action) {
           case SpeedDialAction.RefreshDeliveries: {
-            print("Refresh deliveries");
+            // print("Refresh deliveries");
             EventsService.emitter.emit("refreshDeliveries");
             break;
           }
@@ -129,7 +129,7 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             ClientService.getCreditInfo().then(
               (res) {
                 final body = jsonDecode(res.body);
-                print("credit info data: $body");
+                // print("credit info data: $body");
                 DialogService.showCreditInfoDialog(context: context, remainingCredits: body['credits']);
               }
             );
@@ -170,7 +170,7 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             StorageService.logout().then((_) {
               Navigator.pushNamedAndRemoveUntil(context, 'login', (_) => false);
             });
-            print("logout");
+            // print("logout");
             break;
           }
         }

@@ -74,10 +74,10 @@ class ClientService {
   /// enviar ETA al websocket
   static void sendEtaToWebsocket({String username, Map<String, dynamic> body}) {
     IOWebSocketChannel channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
-    print("${CommonService.wsBaseUrl}/$username/");
+    // print("${CommonService.wsBaseUrl}/$username/");
 
     channel.stream.listen((event) {
-      print("WS response: $event");
+      // print("WS response: $event");
     });
 
     channel.sink.add(jsonEncode(body));
@@ -154,7 +154,7 @@ class ClientService {
         );
       }
       default: {
-        print("add the request method");
+        // print("add the request method");
         return null;
       }
     }

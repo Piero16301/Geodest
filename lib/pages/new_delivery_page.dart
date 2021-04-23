@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -257,7 +258,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   Future<PermissionStatus> _getContactPermission() async {
     PermissionStatus permission = await Permission.contacts.status;
     print("permission status: $permission");
-    if (permission != PermissionStatus.granted) {
+    if (permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied) {
       PermissionStatus permissionStatus = await Permission.contacts.request();
       return permissionStatus;
     } else {
@@ -279,22 +280,33 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
 
   Future<void> _pickContact() async {
     try {
-      final Contact contact = await ContactsService.openDeviceContactPicker(
-          iOSLocalizedLabels: true
-      );
-      setState(() {
-        //FIXME: acá hay un problema, un contacto puede tener varios números celulares
-        /// por ahora, elegimos el primero pero deberíamos mostrar un dropdown con todas las
-        /// opciones
-        String phoneNumber = contact.phones.elementAt(0).value;
-        if (phoneNumber.substring(0, 3) == "+51") {
-          phoneNumber = phoneNumber.substring(3);
-        }
-        //FIXME: probar
-        phoneNumber = removeAllSpaces(fromString: phoneNumber, replaceSpaceBy: '');
-        phoneController.text = phoneNumber;
-        print("contact: ${contact.phones.elementAt(0).value}");
-      });
+      PermissionStatus permissionStatus = await _getContactPermission();
+      if (permissionStatus == PermissionStatus.granted) {
+        final Contact contact = await ContactsService.openDeviceContactPicker(
+            iOSLocalizedLabels: true
+        );
+        setState(() {
+          //FIXME: acá hay un problema, un contacto puede tener varios números celulares
+          /// por ahora, elegimos el primero pero deberíamos mostrar un dropdown con todas las
+          /// opciones
+          String phoneNumber = contact.phones
+              .elementAt(0)
+              .value;
+          if (phoneNumber.substring(0, 3) == "+51") {
+            phoneNumber = phoneNumber.substring(3);
+          }
+          //FIXME: probar
+          phoneNumber =
+              removeAllSpaces(fromString: phoneNumber, replaceSpaceBy: '');
+          phoneController.text = phoneNumber;
+          print("contact: ${contact.phones
+              .elementAt(0)
+              .value}");
+        });
+      } else {
+        final snackBar = SnackBar(content: Text('Se debe dar acceso a los contactos'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
     } catch (e) {
       print("Error al elegir conatcto: ${e.toString()}");
     }

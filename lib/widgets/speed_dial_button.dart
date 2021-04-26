@@ -73,11 +73,11 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       activeIcon: Icons.remove,
       buttonSize: 60,
       overlayOpacity: 0.5,
-      onOpen: () => {
+      onOpen: () {
         print('OPENING DIAL');
       },
-      onClose: () => {
-        print('DIAL CLOSED')
+      onClose: () {
+        print('DIAL CLOSED');
       },
       backgroundColor: primaryColor,
       foregroundColor: Colors.white,

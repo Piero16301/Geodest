@@ -166,7 +166,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
               TextButton(
                 child: const Text('Sí'),
                 onPressed: () async {
-                  if (preferences.getDeliveryStarted() != 0) {
+                  //if (preferences.getDeliveryStarted() != 0) {
                     int pk = deliveryResponse.pk;
                     LocationPermission permission;
                     permission = await Geolocator.checkPermission();
@@ -247,12 +247,12 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                             subtitle: 'Compruebe su conexión e inténtelo nuevamente.');
                       }
                     });
-                  } else {
+                  /*} else {
                     Navigator.of(ctx).pop();
                     DialogService.mostrarAlert(context: context,
                         title: 'Ya existe un viaje en curso',
                         subtitle: 'No puede iniciar dos viajes en simultáneo.');
-                  }
+                  }*/
                 },
               ),
               TextButton(

@@ -16,7 +16,7 @@ class GeodestInterceptor implements InterceptorContract {
   /// REQUEST
   @override
   Future<RequestData> interceptRequest({RequestData data}) async {
-    // print("Request intercepted, data: ${data.toString()}");
+    print("Request intercepted, data: ${data.toString()}");
 
     if (data.url.toString().contains("refresh")) {
       data.headers["Content-Type"] = "application/json";
@@ -27,7 +27,7 @@ class GeodestInterceptor implements InterceptorContract {
 
     data.headers["Content-Type"] = "application/json";
     data.headers["Authorization"] = "Bearer $accessToken";
-    // print("Authorization: ${data.headers["Authorization"]}");
+    print("Authorization: ${data.headers["Authorization"]}");
 
     lastRequest = data;
 
@@ -40,23 +40,23 @@ class GeodestInterceptor implements InterceptorContract {
 
     /// sin este if, se hace un loop recursivo, Lmao
     if (data.url.toString().contains("refresh") || tokenExpired) {
-      // print("SAVING LAST RESPONSE DATA: req url: ${data.url}");
+      print("SAVING LAST RESPONSE DATA: req url: ${data.url}");
       tokenExpired = false;
       return data;
     }
 
     lastRequestResponseData = data;
 
-    // print("Response intercepted, data:\n ${data.toString()}");
+    print("Response intercepted, data:\n ${data.toString()}");
 
     if (data.statusCode == 401) {
       tokenExpired = true;
 
-      // print("Refreshing token...");
+      print("Refreshing token...");
 
       http.Response res = await ClientService.refreshToken();
 
-      // print(res.body);
+      print(res.body);
 
       if (res.statusCode == 401) {
         await StorageService.logout();
@@ -69,27 +69,27 @@ class GeodestInterceptor implements InterceptorContract {
       if (body["access"] != null) {
         await StorageService.saveAccessToken(body["access"]);
       } else {
-        // print("REFRESHED TOKEN BUT GOT NO NEW ACCESS TOKEN");
+        print("REFRESHED TOKEN BUT GOT NO NEW ACCESS TOKEN");
         /// creo q en este caso, tenemos que desloguear al usuario
         /// o el usuario hizo login con las credenciales incorrectas
         return data;
       }
 
       //FIXME: tengo q retornar la data de este request
-      // print("A PUNTO DE REPETIR EL REQUEST");
+      print("A PUNTO DE REPETIR EL REQUEST");
       await ClientService.sendRequest(
           url: lastRequest.url,
           method: methodToString(lastRequest.method),
           body: lastRequest.body
       );
 
-      // print("Retrying request: ${data.url}");
-      // print("Retried request data: ${lastRequestResponseData.body}");
+      print("Retrying request: ${data.url}");
+      print("Retried request data: ${lastRequestResponseData.body}");
 
       return lastRequestResponseData;
 
     } else {
-      // print("Normal response");
+      print("Normal response");
     }
 
     return data;

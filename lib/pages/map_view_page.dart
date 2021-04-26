@@ -40,7 +40,7 @@ class _MapViewPageState extends State<MapViewPage> {
       icon: Icon(Icons.map),
       backgroundColor: primaryColor,
       onPressed: () async {
-        // print("Abriendo Google Maps");
+        print("Abriendo Google Maps");
         openMaps(latitude: lat, longitude: lng);
       },
     );

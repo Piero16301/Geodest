@@ -35,7 +35,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       buff.forEach((post) {
         parsedDeliveries.add(DeliveryResponse.fromJson(post as Map<String, dynamic>));
       });
-      // print("Deliveries: $parsedDeliveries");
+      print("Deliveries: $parsedDeliveries");
       return parsedDeliveries;
     } else {
       throw "[ERROR] (status code ${res.statusCode}): fetching deliveries";
@@ -46,7 +46,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
   void initState() {
     super.initState();
     EventsService.emitter.on("refreshDeliveries", context, (ev, context) {
-      // print("refresco de deliveries");
+      print("refresco de deliveries");
       if (this.mounted) {
         setState(() {});
       }
@@ -101,7 +101,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
   }
 
   Widget _deliveryCard({snapshot, idx}) {
-    // // print("Snapshot: ${snapshot.data[idx].toJson()} Idx: $idx");
+    // print("Snapshot: ${snapshot.data[idx].toJson()} Idx: $idx");
     return Column(
       children: [
         Container(height: 10),
@@ -123,7 +123,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                       ///mostrar detalles del pedido
                       Navigator.pushNamed(context, 'delivery_details', arguments: snapshot.data[idx]).then((_) {
                         setState(() {
-                          // print("refreshing deliveries");
+                          print("refreshing deliveries");
                         });
                       });
                     },
@@ -139,7 +139,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   onTap: () {
                     String deliveryURL = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
                     Clipboard.setData(ClipboardData(text: deliveryURL));
-                    // print("URL $deliveryURL copiada al portapapeles");
+                    print("URL $deliveryURL copiada al portapapeles");
                   },
                 ),
                 IconSlideAction(
@@ -152,9 +152,9 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                     String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\nhttps://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
                     String result = await FlutterSms.sendSMS(message: message, recipients: number)
                     .catchError((onError) {
-                      // print(onError);
+                      print(onError);
                     });
-                    // print(result);
+                    print(result);
                   },
                 ),
                 IconSlideAction(
@@ -193,7 +193,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
   void dispose() {
     super.dispose();
     EventsService.emitter.removeListener("refreshDeliveries", (a, b) {
-      // print("unsubscribing from event emitter");
+      print("unsubscribing from event emitter");
     });
   }
 

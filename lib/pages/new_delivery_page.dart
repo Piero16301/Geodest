@@ -173,7 +173,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
       (clipboardValue) {
         setState(() {
           addressController.text = clipboardValue;
-          // print("clipboardValue: $clipboardValue");
+          print("clipboardValue: $clipboardValue");
         });
       }
     );
@@ -209,7 +209,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   bool _isNumeric(String s) {
     try{
       var value = double.parse(s);
-      // print(value);
+      print(value);
     } on FormatException {
       return false;
     }
@@ -257,7 +257,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
 
   Future<PermissionStatus> _getContactPermission() async {
     PermissionStatus permission = await Permission.contacts.status;
-    // print("permission status: $permission");
+    print("permission status: $permission");
     if (permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied) {
       PermissionStatus permissionStatus = await Permission.contacts.request();
       return permissionStatus;
@@ -299,16 +299,14 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           phoneNumber =
               removeAllSpaces(fromString: phoneNumber, replaceSpaceBy: '');
           phoneController.text = phoneNumber;
-          // print("contact: ${contact.phones
-          //    .elementAt(0)
-          //    .value}");
+          print("contact: ${contact.phones.elementAt(0).value}");
         });
       } else {
         final snackBar = SnackBar(content: Text('Se debe dar acceso a los contactos'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     } catch (e) {
-      // print("Error al elegir conatcto: ${e.toString()}");
+      print("Error al elegir conatcto: ${e.toString()}");
     }
   }
 
@@ -387,11 +385,11 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
               } else {
                 delivery = DeliveryRequest(address: addressController.text, link: '', latitude: finalAddress.result.geometry.location.lat, longitude: finalAddress.result.geometry.location.lng, receiver: clientController.text, phone: int.parse(phoneController.text));
               }
-              // print("Delivery: ${delivery.toJson()}");
+              print("Delivery: ${delivery.toJson()}");
               ClientService.postDelivery(
                 delivery.toJson()
               ).then((res) {
-                // print('Code: ${res.statusCode} Body: ${res.body}');
+                print('Code: ${res.statusCode} Body: ${res.body}');
                 if (res.statusCode == 200) {
                   final body = jsonDecode(res.body);
 
@@ -402,7 +400,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
                     return;
                   }
 
-                  // print("Body del nuevo pedido: $body");
+                  print("Body del nuevo pedido: $body");
                   EventsService.emitter.emit("refreshDeliveries");
                   Navigator.popUntil(context, (route) => route.settings.name == "deliveries");
                 } else {
@@ -420,7 +418,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   @override
   void dispose() {
     super.dispose();
-    // print("disposed NewDeliveryPage");
+    print("disposed NewDeliveryPage");
   }
 
 }

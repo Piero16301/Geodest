@@ -93,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ).then((res) {
                                       if (res.statusCode == 200) {
                                         final body = jsonDecode(res.body);
-                                        // print("Body del login: $body");
+                                        print("Body del login: $body");
                                         ///save Access and Refresh token
                                         StorageService.saveAccessToken(body['access']).then((_) {
                                           StorageService.saveRefreshToken(body['refresh']).then((_) {

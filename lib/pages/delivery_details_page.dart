@@ -240,6 +240,16 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                           buttonIcon = Icons.check;
                           buttonColor = primaryColor;
                         });
+
+                        ///Enviar mensaje por WhatsApp
+                        String number = "+51${deliveryResponse.phone}";
+                        String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\nhttps://geosend.herokuapp.com/deliveries/${deliveryResponse.token}\n¡Gracias!";
+                        final whatsAppLink = WhatsAppUnilink(
+                          phoneNumber: number,
+                          text: message,
+                        );
+                        await launch('$whatsAppLink');
+
                       } else {
                         Navigator.of(context).pop();
                         DialogService.mostrarAlert(context: context,

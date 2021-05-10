@@ -3,6 +3,7 @@ enum SpeedDialAction {
   RefreshDeliveries,
   AddDelivery,
   Logout,
+  EditProfile,
   ShowCreditInfo,
   None
 }

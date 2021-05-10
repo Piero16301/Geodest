@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:background_location/background_location.dart';
+import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:geodest/services/client_service.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -82,6 +83,7 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
       children: [
         //TODO: cada _dialChild debería ser un widget, ya sea stateless o stateful, hay un switch enorme que no debería estar ahí (por legibilidad)
         _dialChild(action: SpeedDialAction.Logout, context: context, icon: Icon(Icons.logout), color: Colors.deepPurpleAccent, label: "Logout", route: 'login'),
+        _dialChild(action: SpeedDialAction.EditProfile, context: context, icon: Icon(Icons.person), color: Colors.deepOrange, label: "Editar perfil", route: 'login'),
         _dialChild(action: SpeedDialAction.ShowCreditInfo, context: context, icon: Icon(Icons.attach_money), color: Colors.purpleAccent, label: "Mis Créditos"),
         _dialChild(action: SpeedDialAction.ShareLocation, context: context, icon: shareLocationIcon, color: shareLocationColor, label: shareLocationText, route: 'login'),
         _dialChild(action: SpeedDialAction.RefreshDeliveries, context: context, icon: Icon(Icons.update), color: Colors.blue, label: "Actualizar pedidos", route: 'splash'),
@@ -166,6 +168,10 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
             Navigator.pushNamed(context, 'new_delivery');
             break;
           }
+          case SpeedDialAction.EditProfile: {
+            openEditProfileTab();
+            break;
+          }
           case SpeedDialAction.Logout: {
             StorageService.logout().then((_) {
               Navigator.pushNamedAndRemoveUntil(context, 'login', (_) => false);
@@ -175,6 +181,16 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
           }
         }
       },
+    );
+  }
+
+  openEditProfileTab() async {
+    await FlutterWebBrowser.openWebPage(
+      url: "https://geosend.herokuapp.com/accounts/profile/",
+      customTabsOptions: CustomTabsOptions(
+        toolbarColor: primaryColor,
+        showTitle: true,
+      ),
     );
   }
 

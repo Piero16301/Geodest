@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:geodest/models/user.dart';
+import 'package:geodest/services/common_service.dart';
 import 'package:geodest/services/dialog_service.dart';
 import 'package:geodest/services/storage_service.dart';
 import 'package:geodest/utils/colors.dart';
@@ -165,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
 
   openRegisterTab() async {
     await FlutterWebBrowser.openWebPage(
-      url: "https://geosend.herokuapp.com/accounts/signup/",
+      url: "${CommonService.baseUrl}/accounts/signup/",
       customTabsOptions: CustomTabsOptions(
         toolbarColor: primaryColor,
         showTitle: true,

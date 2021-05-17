@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_sms/flutter_sms.dart';
+import 'package:geodest/services/common_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -137,7 +138,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.black54,
                   icon: MdiIcons.contentCopy,
                   onTap: () {
-                    String deliveryURL = "https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}";
+                    String deliveryURL = "${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}";
                     Clipboard.setData(ClipboardData(text: deliveryURL));
                     // print("URL $deliveryURL copiada al portapapeles");
                   },
@@ -149,7 +150,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.blue,
                   onTap: () async {
                     List<String> number = ["+51${snapshot.data[idx].phone}"];
-                    String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\nhttps://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
+                    String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
                     String result = await FlutterSms.sendSMS(message: message, recipients: number)
                     .catchError((onError) {
                       // print(onError);
@@ -164,7 +165,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   icon: MdiIcons.whatsapp,
                   onTap: () async {
                     String number = "+51${snapshot.data[idx].phone}";
-                    String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\nhttps://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
+                    String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
                     final whatsAppLink = WhatsAppUnilink(
                       phoneNumber: number,
                       text: message,
@@ -178,7 +179,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.black54,
                   icon: MdiIcons.share,
                   onTap: () async {
-                    await Share.share("https://geosend.herokuapp.com/deliveries/${snapshot.data[idx].token}");
+                    await Share.share("${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}");
                   },
                 ),
               ],

@@ -7,6 +7,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:background_location/background_location.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:geodest/services/client_service.dart';
+import 'package:geodest/services/common_service.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'package:geodest/utils/colors.dart';
@@ -186,7 +187,7 @@ class _SpeedDialButtonState extends State<SpeedDialButton> {
 
   openEditProfileTab() async {
     await FlutterWebBrowser.openWebPage(
-      url: "https://geosend.herokuapp.com/accounts/profile/",
+      url: "${CommonService.baseUrl}/accounts/profile/",
       customTabsOptions: CustomTabsOptions(
         toolbarColor: primaryColor,
         showTitle: true,

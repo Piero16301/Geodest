@@ -20,7 +20,8 @@ class _SplashPageState extends State<SplashPage> {
         //TODO: Hay un error cuando se entra de frente a deliveries, porque no hay headers para hacer el GET
         Navigator.pushNamedAndRemoveUntil(context, 'deliveries', (_) => false);
       } else {
-        Navigator.pushNamedAndRemoveUntil(context, 'login', (_) => false);
+        showProminentDisclosure(context);
+        // Navigator.pushNamedAndRemoveUntil(context, 'login', (_) => false);
       }
     });
   }
@@ -41,6 +42,33 @@ class _SplashPageState extends State<SplashPage> {
           child: Image.asset("assets/logo_green.png", height: 200),
         ),
       ),
+    );
+  }
+
+  static void showProminentDisclosure(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          title: Text("Política de uso de ubicación"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text("Esta aplicación recopila datos de ubicación para que el cliente pueda visualizar la ubicación de su pedido en tiempo real y poder calcular el tiempo estimado de llegada del pedido, incluso cuando la aplicación esté cerrada o no está en uso."),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Aceptar'),
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(context, 'login', (_) => false);
+              },
+            ),
+          ],
+        );
+      }
     );
   }
 }

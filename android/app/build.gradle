@@ -43,8 +43,8 @@ android {
         applicationId "com.geodest.geodest"
         minSdkVersion 18        // No tocar
         targetSdkVersion 30     // No tocar
-        versionCode 3           // Aumentar en 1 cada vez que se haga una paublicación a Play Store
-        versionName "1.0.2"     // Cambiar la versión antes de hacer la publicación
+        versionCode 4           // Aumentar en 1 cada vez que se haga una paublicación a Play Store
+        versionName "1.0.4"     // Cambiar la versión antes de hacer la publicación
     }
 
     signingConfigs {

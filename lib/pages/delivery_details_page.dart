@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geodest/services/common_service.dart';
 import 'package:geodest/services/user_preferences.dart';
 
 import 'package:geolocator/geolocator.dart';
@@ -243,7 +244,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
 
                         ///Enviar mensaje por WhatsApp
                         String number = "+51${deliveryResponse.phone}";
-                        String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\nhttps://geosend.herokuapp.com/deliveries/${deliveryResponse.token}\n¡Gracias!";
+                        String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/${deliveryResponse.token}\n¡Gracias!";
                         final whatsAppLink = WhatsAppUnilink(
                           phoneNumber: number,
                           text: message,

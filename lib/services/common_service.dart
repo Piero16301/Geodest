@@ -1,5 +1,5 @@
 class CommonService {
-  static const String baseUrl = 'https://caudalservice.com';
+  static const String baseUrl = 'https://www.caudalservice.com';
   static const String deliveryUrl = baseUrl + '/api/deliveries';
   static const String loginUrl = baseUrl + '/auth/jwt/create';
   static const String usernameUrl = baseUrl + '/api/username';

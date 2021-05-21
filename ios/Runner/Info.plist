@@ -21,13 +21,29 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Lo necesitamos para darte una mejor experiencia de usuario.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Lo necesitamos para darte una mejor experiencia de usuario.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Lo necesitamos para darte una mejor experiencia de usuario.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Lo necesitamos para darte una mejor experiencia de usuario.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Lo necesitamos para que elijas en número del cliente más fácilmente.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>La necesitamos para compartir tu ubicación con el cliente.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
 	<string>La necesitamos para compartir tu ubicación con el cliente.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>La necesitamos para compartir tu ubicación con el cliente.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>La necesitamos para compartir tu ubicación con el cliente.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Lo necesitamos para darte una mejor experiencia de usuario.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -53,7 +69,5 @@
 	<false/>
 	<key>allowsBackgroundLocationUpdates</key>
 	<true/>
-	<key>NSContactsUsageDescription</key>
-    <string>Lo necesitamos para que elijas en número del cliente más fácilmente.</string>
 </dict>
 </plist>

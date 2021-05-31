@@ -43,9 +43,9 @@ class LocationService {
 
     /// lo de abajo es para debugging
     //TODO: comentar antes del deploy
-    _channel.stream.listen((event) {
+    // _channel.stream.listen((event) {
       // print("WS response: $event");
-    });
+    // });
 
     BackgroundLocation.setAndroidNotification(
       title: "Compartiendo tu ubicación...",
@@ -65,7 +65,6 @@ class LocationService {
       BackgroundLocation.getLocationUpdates((Location location) {
         _counter++;
         // si se movió 50m*30=1500m, mandar el PUT
-        //TODO: cambiar a 30
         if (_counter % 30 == 0) {
           // print("================MANDAR PUT===================");
           http.put(

@@ -75,7 +75,9 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                 itemCount: snapshot.data.length,
                 padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                 itemBuilder: (BuildContext ctx, int idx) {
-                  return _deliveryCard(snapshot: snapshot, idx: idx);
+                  if (idx == 0) {
+                    return _deliveryCard(snapshot: snapshot, idx: idx);
+                  }
                 },
               );
             } else if (snapshot.hasError) {

@@ -26,6 +26,8 @@
 	<true/>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Lo necesitamos para darte una mejor experiencia de usuario.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Lo necesitamos para que puedas elegir una foto de perfil cuando te registres.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Lo necesitamos para darte una mejor experiencia de usuario.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>

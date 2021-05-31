@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,8 @@ import 'package:geodest/services/common_service.dart';
 import 'package:geodest/services/dialog_service.dart';
 import 'package:geodest/services/storage_service.dart';
 import 'package:geodest/utils/colors.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:system_settings/system_settings.dart';
 
 import '../services/client_service.dart';
 import '../services/loader_service.dart';
@@ -26,6 +29,25 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _isHidden = true;
 
+  Future<bool> _checkCameraPermissions({BuildContext ctx}) async {
+    if (Platform.isIOS) {
+      var status = await Permission.camera.status;
+      if (!status.isGranted) {
+        status = await Permission.camera.request();
+        print("status: $status");
+        if (!status.isGranted) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +62,8 @@ class _LoginPageState extends State<LoginPage> {
                   end: Alignment.topCenter,
                   begin: Alignment.bottomCenter,
                 ),
-                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(100)),
+                borderRadius:
+                    BorderRadius.only(bottomLeft: Radius.circular(100)),
               ),
               child: Center(
                 child: Image.asset("assets/logo_white.png", height: 150),
@@ -57,8 +80,16 @@ class _LoginPageState extends State<LoginPage> {
                       key: _formKey,
                       child: Column(
                         children: [
-                          _textEmailInput(hint: "Ingrese su correo electrónico", label: "Correo electrónico", icon: Icons.email, controller: emailController),
-                          _textPasswordInput(hint: "Ingrese su contraseña", label: "Contraseña", icon: Icons.vpn_key, controller: passwordController),
+                          _textEmailInput(
+                              hint: "Ingrese su correo electrónico",
+                              label: "Correo electrónico",
+                              icon: Icons.email,
+                              controller: emailController),
+                          _textPasswordInput(
+                              hint: "Ingrese su contraseña",
+                              label: "Contraseña",
+                              icon: Icons.vpn_key,
+                              controller: passwordController),
                           Container(height: 50),
                           Center(
                             child: SizedBox(
@@ -76,38 +107,57 @@ class _LoginPageState extends State<LoginPage> {
                                 style: ElevatedButton.styleFrom(
                                   primary: primaryColor,
                                   onPrimary: Colors.white,
-                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(100))),
                                 ),
                                 onPressed: () {
                                   if (_formKey.currentState.validate()) {
-                                    LoaderService.setIsLoading(message: "Iniciando sesión...", waiting: true, context: context);
+                                    LoaderService.setIsLoading(
+                                        message: "Iniciando sesión...",
+                                        waiting: true,
+                                        context: context);
 
                                     ///lo de abajo es para debuggear
                                     // Future.delayed(Duration(seconds: 5)).then((_) {
                                     //   setIsLoading(waiting: false, context: context);
                                     // });
 
-                                    User user = User(email: emailController.text, password: passwordController.text);
+                                    User user = User(
+                                        email: emailController.text,
+                                        password: passwordController.text);
 
-                                    ClientService.login(
-                                        user.toJson()
-                                    ).then((res) {
+                                    ClientService.login(user.toJson())
+                                        .then((res) {
                                       if (res.statusCode == 200) {
                                         final body = jsonDecode(res.body);
                                         // print("Body del login: $body");
                                         ///save Access and Refresh token
-                                        StorageService.saveAccessToken(body['access']).then((_) {
-                                          StorageService.saveRefreshToken(body['refresh']).then((_) {
-                                            LoaderService.setIsLoading(waiting: false);
+                                        StorageService.saveAccessToken(
+                                                body['access'])
+                                            .then((_) {
+                                          StorageService.saveRefreshToken(
+                                                  body['refresh'])
+                                              .then((_) {
+                                            LoaderService.setIsLoading(
+                                                waiting: false);
+
                                             ///pushNamedAndRemoveUntil para borrar el navigator stack y no poder volver
                                             ///a la vista del login
-                                            Navigator.pushNamedAndRemoveUntil(context, 'deliveries', (_) => false);
+                                            Navigator.pushNamedAndRemoveUntil(
+                                                context,
+                                                'deliveries',
+                                                (_) => false);
                                           });
                                         });
                                       } else {
                                         ///dialog diciendo que las credenciales son incorrectas
                                         Navigator.of(context).pop();
-                                        DialogService.mostrarAlert(context: context, title: "Credenciales incorrectas", subtitle: "Verifica tu correo y/o contraseña e inténtalo de nuevo");
+                                        DialogService.mostrarAlert(
+                                            context: context,
+                                            title: "Credenciales incorrectas",
+                                            subtitle:
+                                                "Verifica tu correo y/o contraseña e inténtalo de nuevo");
                                       }
                                     });
                                   }
@@ -140,11 +190,40 @@ class _LoginPageState extends State<LoginPage> {
                                   style: ElevatedButton.styleFrom(
                                     primary: primaryColor,
                                     onPrimary: Colors.white,
-                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(100))),
                                   ),
                                   onPressed: () {
-                                    //Navigator.pushNamed(context, 'register');
-                                    openRegisterTab();
+                                    _checkCameraPermissions(ctx: context)
+                                        .then((granted) {
+                                      if (granted) {
+                                        openRegisterTab();
+                                      } else {
+                                        showDialog(
+                                          context: context,
+                                          builder: (_) {
+                                            return AlertDialog(
+                                              title: const Text(
+                                                  "¡Necesitamos tu permiso!"),
+                                              content: const Text(
+                                                  "Para que puedas elegir una foto de perfil, necesitamos tu permiso. Por favor, anda a Ajustes y cambia los permisos."),
+                                              actions: [
+                                                TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      SystemSettings.app();
+                                                    },
+                                                    child: const Text("OK"))
+                                              ],
+                                              elevation: 30.0,
+                                            );
+                                          },
+                                          barrierDismissible: false,
+                                        );
+                                      }
+                                    });
                                   },
                                 ),
                               ),
@@ -198,7 +277,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
   Widget _textPasswordInput({controller, hint, label, icon}) {
     return Container(
       margin: EdgeInsets.only(top: 30),
@@ -236,4 +314,3 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 }
-

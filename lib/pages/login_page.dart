@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
       var status = await Permission.camera.status;
       if (!status.isGranted) {
         status = await Permission.camera.request();
-        print("status: $status");
+        // print("status: $status");
         if (!status.isGranted) {
           return false;
         } else {

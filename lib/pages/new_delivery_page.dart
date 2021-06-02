@@ -350,7 +350,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           labelText: label,
           icon: Icon(icon),
         ),
-        keyboardType: TextInputType.phone,
+        keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly

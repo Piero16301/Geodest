@@ -292,7 +292,6 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                   int pk = deliveryResponse.pk;
                   StartEndTrip startEndTrip = StartEndTrip(state: DeliveryState.End);
                   ClientService.completeDelivery(id: pk, body: startEndTrip.toJson()).then((res) async {
-                    //TODO: feedback cuando
                     if (res.statusCode == 200) {
                       // print("Pedido marcado como completado");
                       ///funciona pero da exception por alguna razon

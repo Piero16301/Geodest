@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:geodest/services/common_service.dart';
+import 'package:geodest/services/dialog_service.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -75,9 +77,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                 itemCount: snapshot.data.length,
                 padding: const EdgeInsets.only(top: 10.0, bottom: 20.0),
                 itemBuilder: (BuildContext ctx, int idx) {
-                  if (idx == 0) {
-                    return _deliveryCard(snapshot: snapshot, idx: idx);
-                  }
+                  return _deliveryCard(snapshot: snapshot, idx: idx);
                 },
               );
             } else if (snapshot.hasError) {
@@ -113,7 +113,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
             elevation: 5,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Slidable(
-              actionPane: SlidableDrawerActionPane(),
+              actionPane: const SlidableDrawerActionPane(),
               actionExtentRatio: 0.25,
               child: Column(
                 children: [
@@ -152,7 +152,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.blue,
                   onTap: () async {
                     List<String> number = ["+51${snapshot.data[idx].phone}"];
-                    String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
+                    String message = _getTrackDeliveryMessage(snapshot.data[idx].token);
                     String result = await FlutterSms.sendSMS(message: message, recipients: number)
                     .catchError((onError) {
                       // print(onError);
@@ -167,7 +167,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   icon: MdiIcons.whatsapp,
                   onTap: () async {
                     String number = "+51${snapshot.data[idx].phone}";
-                    String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}\n¡Gracias!";
+                    String message = _getTrackDeliveryMessage(snapshot.data[idx].token);
                     final whatsAppLink = WhatsAppUnilink(
                       phoneNumber: number,
                       text: message,
@@ -190,6 +190,14 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         ),
       ],
     );
+  }
+
+  String _getTrackDeliveryMessage(String token) {
+    if (Platform.isAndroid) {
+      return "¡Hola! ✋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+    } else {
+      return "¡Hola! ✋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+    }
   }
 
   @override

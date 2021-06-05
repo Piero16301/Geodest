@@ -244,7 +244,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
 
                         ///Enviar mensaje por WhatsApp
                         String number = "+51${deliveryResponse.phone}";
-                        String message = "¡Hola! ✋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/${deliveryResponse.token}\n¡Gracias!";
+                        String message = "¡Hola! 👋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/${deliveryResponse.token}\n¡Gracias!";
                         final whatsAppLink = WhatsAppUnilink(
                           phoneNumber: number,
                           text: message,
@@ -297,7 +297,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       ///funciona pero da exception por alguna razon
                       Navigator.of(context).pop();
                       String number = "+51${deliveryResponse.phone}";
-                      String message = "¡Hola de nuevo! ✋\nTu pedido ha llegado a su destino.";
+                      String message = "¡Hola de nuevo! 👋\nTu pedido ha llegado a su destino.";
                       final whatsAppLink = WhatsAppUnilink(
                         phoneNumber: number,
                         text: message,

@@ -196,7 +196,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
     if (Platform.isAndroid) {
       return "¡Hola! 👋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
     } else {
-      return "¡Hola! 👋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+      return "¡Hola!\nRastrea tu pedido aquí:\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
     }
   }
 

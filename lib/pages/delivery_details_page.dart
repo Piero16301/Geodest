@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:geodest/services/common_service.dart';
@@ -244,7 +245,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
 
                         ///Enviar mensaje por WhatsApp
                         String number = "+51${deliveryResponse.phone}";
-                        String message = "¡Hola! 👋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/${deliveryResponse.token}\n¡Gracias!";
+                        String message = _getTrackDeliveryMessage(deliveryResponse.token);
                         final whatsAppLink = WhatsAppUnilink(
                           phoneNumber: number,
                           text: message,
@@ -278,6 +279,22 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
     );
   }
 
+  String _getTrackDeliveryMessage(String token) {
+    if (Platform.isAndroid) {
+      return "¡Hola! 👋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+    } else {
+      return "¡Hola!\nRastrea tu pedido aquí:\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+    }
+  }
+
+  String _getFinishedDeliveryMessage(String token) {
+    if (Platform.isAndroid) {
+      return "¡Hola de nuevo! 👋\nTu pedido ha llegado a su destino.";
+    } else {
+      return "¡Hola de nuevo!\nTu pedido ha llegado a su destino.";
+    }
+  }
+
   void _confirmFinishDelivery(BuildContext context) {
     showDialog(
         context: context,
@@ -297,7 +314,7 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       ///funciona pero da exception por alguna razon
                       Navigator.of(context).pop();
                       String number = "+51${deliveryResponse.phone}";
-                      String message = "¡Hola de nuevo! 👋\nTu pedido ha llegado a su destino.";
+                      String message = _getFinishedDeliveryMessage(deliveryResponse.token);
                       final whatsAppLink = WhatsAppUnilink(
                         phoneNumber: number,
                         text: message,

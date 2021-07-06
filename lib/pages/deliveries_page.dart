@@ -12,6 +12,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_unilink/whatsapp_unilink.dart';
+import 'package:flutter_emoji/flutter_emoji.dart'; // nueva dependecia
 
 import 'package:geodest/models/delivery_response.dart';
 import 'package:geodest/services/client_service.dart';
@@ -28,7 +29,6 @@ class DeliveriesPage extends StatefulWidget {
 }
 
 class _DeliveriesPageState extends State<DeliveriesPage> {
-
   Future<List<DeliveryResponse>> obtainDeliveries() async {
     var res = await ClientService.getDeliveries();
 
@@ -36,7 +36,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       List<dynamic> buff = jsonDecode(res.body) as List<dynamic>;
       List<DeliveryResponse> parsedDeliveries = [];
       buff.forEach((post) {
-        parsedDeliveries.add(DeliveryResponse.fromJson(post as Map<String, dynamic>));
+        parsedDeliveries
+            .add(DeliveryResponse.fromJson(post as Map<String, dynamic>));
       });
       // print("Deliveries: $parsedDeliveries");
       return parsedDeliveries;
@@ -58,12 +59,12 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: const Text("Pedidos"),
         backgroundColor: primaryColor,
+
         ///Para ocultar el botón atrás del AppBar
         automaticallyImplyLeading: false,
       ),
@@ -71,7 +72,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         margin: const EdgeInsets.only(left: 20, right: 20),
         child: FutureBuilder(
           future: obtainDeliveries(),
-          builder: (BuildContext ctx, AsyncSnapshot<List<DeliveryResponse>> snapshot) {
+          builder: (BuildContext ctx,
+              AsyncSnapshot<List<DeliveryResponse>> snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
                 itemCount: snapshot.data.length,
@@ -85,9 +87,9 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                 padding: EdgeInsets.only(top: 25.0, left: 30.0, right: 30.0),
                 child: Text(
                   "Ocurrió un error. Inténtalo de nuevo más tarde.",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               );
             } else {
@@ -111,7 +113,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         Container(
           child: Card(
             elevation: 5,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Slidable(
               actionPane: const SlidableDrawerActionPane(),
               actionExtentRatio: 0.25,
@@ -124,7 +127,9 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                     // trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       ///mostrar detalles del pedido
-                      Navigator.pushNamed(context, 'delivery_details', arguments: snapshot.data[idx]).then((_) {
+                      Navigator.pushNamed(context, 'delivery_details',
+                              arguments: snapshot.data[idx])
+                          .then((_) {
                         setState(() {
                           // print("refreshing deliveries");
                         });
@@ -140,7 +145,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.black54,
                   icon: MdiIcons.contentCopy,
                   onTap: () {
-                    String deliveryURL = "${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}";
+                    String deliveryURL =
+                        "${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}";
                     Clipboard.setData(ClipboardData(text: deliveryURL));
                     // print("URL $deliveryURL copiada al portapapeles");
                   },
@@ -152,9 +158,13 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.blue,
                   onTap: () async {
                     List<String> number = ["+51${snapshot.data[idx].phone}"];
-                    String message = _getTrackDeliveryMessage(snapshot.data[idx].token);
-                    String result = await FlutterSms.sendSMS(message: message, recipients: number)
-                    .catchError((onError) {
+                    String message = _getTrackDeliveryMessage(
+                        snapshot.data[idx].token,
+                        snapshot.data[idx].brand,
+                        snapshot.data[idx].receiver);
+                    String result = await FlutterSms.sendSMS(
+                            message: message, recipients: number)
+                        .catchError((onError) {
                       // print(onError);
                     });
                     // print(result);
@@ -167,12 +177,18 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   icon: MdiIcons.whatsapp,
                   onTap: () async {
                     String number = "+51${snapshot.data[idx].phone}";
-                    String message = _getTrackDeliveryMessage(snapshot.data[idx].token);
+                    String message = _getTrackDeliveryMessage(
+                        snapshot.data[idx].token,
+                        snapshot.data[idx].brand,
+                        snapshot.data[idx].receiver);
                     final whatsAppLink = WhatsAppUnilink(
                       phoneNumber: number,
                       text: message,
                     );
-                    await launch('$whatsAppLink');
+                    await launch(
+                        '$whatsAppLink'); // se supone que si abre si se tiene whatsapp instalado
+                    // Alternativa: (comentar el await anterior y activar este await launch
+                    // await launch("https://wa.me/${number}?text=:${message}"),   // aca se usa el api directo, por lo que si abre si se tiene whatsapp instalado ademas que jalamos info del codigo anterior
                   },
                 ),
                 IconSlideAction(
@@ -181,7 +197,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
                   foregroundColor: Colors.black54,
                   icon: MdiIcons.share,
                   onTap: () async {
-                    await Share.share("${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}");
+                    await Share.share(
+                        "${CommonService.baseUrl}/deliveries/${snapshot.data[idx].token}");
                   },
                 ),
               ],
@@ -192,11 +209,15 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
     );
   }
 
-  String _getTrackDeliveryMessage(String token) {
-    if (Platform.isAndroid) {
-      return "¡Hola! 👋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+  var parser = EmojiParser();
+
+  String _getTrackDeliveryMessage(String token, String brand, String receiver) {
+    if (brand != null && receiver != null) {
+      return parser.emojify(
+          '¡Hola $receiver! :wave:\nRastrea tu pedido de $brand aquí :point_down: :\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!');
     } else {
-      return "¡Hola!\nRastrea tu pedido aquí:\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+      return parser.emojify(
+          '¡Hola! :wave:\nRastrea tu pedido aquí :point_down: :\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!');
     }
   }
 
@@ -207,5 +228,4 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       // print("unsubscribing from event emitter");
     });
   }
-
 }

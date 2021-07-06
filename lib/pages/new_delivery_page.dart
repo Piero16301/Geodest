@@ -26,6 +26,7 @@ class NewDeliveryPage extends StatefulWidget {
 class _NewDeliveryPageState extends State<NewDeliveryPage> {
   final addressController = TextEditingController();
   final clientController = TextEditingController();
+  final brandController = TextEditingController();
   final phoneController = TextEditingController();
 
   PlacesDetailsResponse finalAddress;
@@ -61,12 +62,33 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
               child: Column(
                 children: [
                   // FIXME: _addressInput y _pillToggle deberían ser un solo stateful widget, esto hace que sea más rápida la aplicación
-                  if (_isSelected[address]) _addressInput(link: false, controller: addressController, label: "Dirección del comprador", icon: Icons.home),
-                  if (_isSelected[link]) _addressInput(link: true, controller: addressController, label: "Link de Google Maps", icon: Icons.home),
+                  if (_isSelected[address])
+                    _addressInput(
+                        link: false,
+                        controller: addressController,
+                        label: "Dirección del comprador",
+                        icon: Icons.home),
+                  if (_isSelected[link])
+                    _addressInput(
+                        link: true,
+                        controller: addressController,
+                        label: "Link de Google Maps",
+                        icon: Icons.home),
                   _pillAddressToggle(),
-                  _clientInput(controller: clientController, label: "Nombre del comprador", icon: Icons.person),
+                  _clientInput(
+                      controller: clientController,
+                      label: "Nombre del comprador",
+                      icon: Icons.person),
+                  _brandInput(
+                      controller: brandController,
+                      label: "Marca",
+                      icon: Icons.wallet_giftcard),
                   // FIXME: _phoneInput y _pillPhoneToggle deberían ser un solo stateful widget, esto hace que sea más rápida la aplicación
-                  _phoneInput(controller: phoneController, label: "Celular del comprador", icon: Icons.phone_android, context: context),
+                  _phoneInput(
+                      controller: phoneController,
+                      label: "Celular del comprador",
+                      icon: Icons.phone_android,
+                      context: context),
                   _pillPhoneToggle(),
                   _createNewDelivery(),
                 ],
@@ -98,15 +120,14 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           setState(() {
             phoneController.text = '';
             _isSelectedPhonePill[idx] = true;
-            _isSelectedPhonePill[1-idx] = false;
+            _isSelectedPhonePill[1 - idx] = false;
             phoneFocus.unfocus();
             if (_isSelectedPhonePill[contacts]) {
               _pickContact();
             }
           });
         },
-        isSelected: _isSelectedPhonePill
-    );
+        isSelected: _isSelectedPhonePill);
   }
 
   Widget _pillAddressToggle() {
@@ -129,12 +150,11 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           setState(() {
             addressController.text = '';
             _isSelected[idx] = true;
-            _isSelected[1-idx] = false;
+            _isSelected[1 - idx] = false;
             addressFocus.unfocus();
           });
         },
-        isSelected: _isSelected
-    );
+        isSelected: _isSelected);
   }
 
   Widget _addressInput({bool link, controller, label, icon}) {
@@ -157,10 +177,12 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           ),
           labelText: label,
           icon: Icon(icon),
-          suffixIcon: link ? IconButton(
-            icon: Icon(Icons.paste),
-            onPressed: _pasteLinkFromClipboard,
-          ) : null,
+          suffixIcon: link
+              ? IconButton(
+                  icon: Icon(Icons.paste),
+                  onPressed: _pasteLinkFromClipboard,
+                )
+              : null,
         ),
         onTap: !link ? _displaySuggestions : null,
       ),
@@ -169,14 +191,12 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
 
   void _pasteLinkFromClipboard() {
     addressFocus.unfocus();
-    FlutterClipboard.paste().then(
-      (clipboardValue) {
-        setState(() {
-          addressController.text = clipboardValue;
-          // print("clipboardValue: $clipboardValue");
-        });
-      }
-    );
+    FlutterClipboard.paste().then((clipboardValue) {
+      setState(() {
+        addressController.text = clipboardValue;
+        // print("clipboardValue: $clipboardValue");
+      });
+    });
   }
 
   Future<void> _displaySuggestions() async {
@@ -199,7 +219,8 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
       apiHeaders: await GoogleApiHeaders().getHeaders(),
     );
 
-    PlacesDetailsResponse placesDetailsResponse = await googleMapsPlaces.getDetailsByPlaceId(prediction.placeId);
+    PlacesDetailsResponse placesDetailsResponse =
+        await googleMapsPlaces.getDetailsByPlaceId(prediction.placeId);
     setState(() {
       addressController.text = placesDetailsResponse.result.formattedAddress;
       finalAddress = placesDetailsResponse;
@@ -207,7 +228,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   }
 
   bool _isNumeric(String s) {
-    try{
+    try {
       var value = double.parse(s);
       // print(value);
     } on FormatException {
@@ -237,8 +258,34 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           if (value.isEmpty) {
             String tempLabel = label.toString().toLowerCase();
             return 'Por favor, ingrese el $tempLabel';
+          } else if (!_checkString(value)) {
+            String tempLabel = label.toString().toLowerCase();
+            return 'El $tempLabel solo debe contener letras';
           }
-          else if (!_checkString(value)) {
+          return null;
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          labelText: label,
+          icon: Icon(icon),
+        ),
+      ),
+    );
+  }
+
+  Widget _brandInput({controller, label, icon}) {
+    return Container(
+      margin: const EdgeInsets.only(top: 30),
+      height: 80,
+      child: TextFormField(
+        controller: controller,
+        validator: (value) {
+          if (value.isEmpty) {
+            String tempLabel = label.toString().toLowerCase();
+            return 'Por favor, ingrese el $tempLabel';
+          } else if (!_checkString(value)) {
             String tempLabel = label.toString().toLowerCase();
             return 'El $tempLabel solo debe contener letras';
           }
@@ -258,7 +305,8 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
   Future<PermissionStatus> _getContactPermission() async {
     PermissionStatus permission = await Permission.contacts.status;
     // print("permission status: $permission");
-    if (permission != PermissionStatus.granted && permission != PermissionStatus.permanentlyDenied) {
+    if (permission != PermissionStatus.granted &&
+        permission != PermissionStatus.permanentlyDenied) {
       PermissionStatus permissionStatus = await Permission.contacts.request();
       return permissionStatus;
     } else {
@@ -283,15 +331,12 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
       PermissionStatus permissionStatus = await _getContactPermission();
       if (permissionStatus == PermissionStatus.granted) {
         final Contact contact = await ContactsService.openDeviceContactPicker(
-            iOSLocalizedLabels: true
-        );
+            iOSLocalizedLabels: true);
         setState(() {
           //FIXME: acá hay un problema, un contacto puede tener varios números celulares
           /// por ahora, elegimos el primero pero deberíamos mostrar un dropdown con todas las
           /// opciones
-          String phoneNumber = contact.phones
-              .elementAt(0)
-              .value;
+          String phoneNumber = contact.phones.elementAt(0).value;
           if (phoneNumber.substring(0, 3) == "+51") {
             phoneNumber = phoneNumber.substring(3);
           }
@@ -304,7 +349,8 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           //    .value}");
         });
       } else {
-        final snackBar = SnackBar(content: Text('Se debe dar acceso a los contactos'));
+        final snackBar =
+            SnackBar(content: Text('Se debe dar acceso a los contactos'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     } catch (e) {
@@ -323,11 +369,9 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           String tempLabel = label.toString().toLowerCase();
           if (value.isEmpty) {
             return 'Por favor, ingrese el $tempLabel';
-          }
-          else if (value.length != 9) {
+          } else if (value.length != 9) {
             return 'El $tempLabel debe tener 9 dígitos';
-          }
-          else if (value[0] != '9') {
+          } else if (value[0] != '9') {
             return 'El $tempLabel debe ser un número válido';
           }
           return null;
@@ -352,9 +396,7 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
         ),
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.done,
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly
-        ],
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       ),
     );
   }
@@ -377,38 +419,60 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
           style: ElevatedButton.styleFrom(
             primary: primaryColor,
             onPrimary: Colors.white,
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(100))),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(100))),
           ),
           onPressed: () {
             if (_formKey.currentState.validate()) {
-              LoaderService.setIsLoading(message: "Guardando pedido...", waiting: true, context: context);
+              LoaderService.setIsLoading(
+                  message: "Guardando pedido...",
+                  waiting: true,
+                  context: context);
               DeliveryRequest delivery;
               if (_isSelected[link]) {
-                delivery = DeliveryRequest(address: '', link: addressController.text, receiver: clientController.text, phone: int.parse(phoneController.text));
+                delivery = DeliveryRequest(
+                    address: '',
+                    link: addressController.text,
+                    receiver: clientController.text,
+                    brand: brandController.text,
+                    phone: int.parse(phoneController.text));
               } else {
-                delivery = DeliveryRequest(address: addressController.text, link: '', latitude: finalAddress.result.geometry.location.lat, longitude: finalAddress.result.geometry.location.lng, receiver: clientController.text, phone: int.parse(phoneController.text));
+                delivery = DeliveryRequest(
+                    address: addressController.text,
+                    link: '',
+                    latitude: finalAddress.result.geometry.location.lat,
+                    longitude: finalAddress.result.geometry.location.lng,
+                    receiver: clientController.text,
+                    brand: brandController.text,
+                    phone: int.parse(phoneController.text));
               }
               // print("Delivery: ${delivery.toJson()}");
-              ClientService.postDelivery(
-                delivery.toJson()
-              ).then((res) {
+              ClientService.postDelivery(delivery.toJson()).then((res) {
                 // print('Code: ${res.statusCode} Body: ${res.body}');
                 if (res.statusCode == 200) {
                   final body = jsonDecode(res.body);
 
                   if (body['success'] == false) {
                     Navigator.of(context).pop();
-                    DialogService.mostrarAlert(context: context, title: 'No se pudo guardar el pedido', subtitle: body['message']);
+                    DialogService.mostrarAlert(
+                        context: context,
+                        title: 'No se pudo guardar el pedido',
+                        subtitle: body['message']);
                     addressController.text = '';
                     return;
                   }
 
                   // print("Body del nuevo pedido: $body");
                   EventsService.emitter.emit("refreshDeliveries");
-                  Navigator.popUntil(context, (route) => route.settings.name == "deliveries");
+                  Navigator.popUntil(
+                      context, (route) => route.settings.name == "deliveries");
                 } else {
                   Navigator.of(context).pop();
-                  DialogService.mostrarAlert(context: context, title: 'No se pudo guardar el pedido', subtitle: 'Verifica todos los campos e inténtalo nuevamente.');
+                  DialogService.mostrarAlert(
+                      context: context,
+                      title: 'No se pudo guardar el pedido',
+                      subtitle:
+                          'Verifica todos los campos e inténtalo nuevamente.');
                 }
               });
             }
@@ -423,6 +487,4 @@ class _NewDeliveryPageState extends State<NewDeliveryPage> {
     super.dispose();
     // print("disposed NewDeliveryPage");
   }
-
 }
-

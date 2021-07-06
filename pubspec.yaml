@@ -55,6 +55,7 @@ dependencies:
   contacts_service: ^0.6.0                 # Android | iOS
   permission_handler: ^6.0.1+1             # Android | iOS - (No se puede poner la versión 6 xq background_location depende de esta versión)
   geolocator: ^7.0.3                       # Android | iOS | Web
+  flutter_emoji: 2.0.0                     # Android | iOS | Web
 
 dev_dependencies:
   flutter_test:

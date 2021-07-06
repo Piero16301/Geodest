@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_emoji/flutter_emoji.dart'; // nueva dependecia
 import 'package:geodest/services/common_service.dart';
 import 'package:geodest/services/user_preferences.dart';
 
@@ -25,7 +26,6 @@ class DeliveryDetailsPage extends StatefulWidget {
 }
 
 class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
-
   DeliveryResponse deliveryResponse;
 
   String buttonText;
@@ -36,7 +36,6 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     deliveryResponse = ModalRoute.of(context).settings.arguments;
     // print("Pedido: ${deliveryResponse.toJson()}");
     if (preferences.getDeliveryStarted() == deliveryResponse.pk) {
@@ -62,9 +61,18 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
           children: [
             Column(
               children: [
-                _cardDetail(data: deliveryResponse.address, field: "Dirección del comprador", icon: Icons.home),
-                _cardDetail(data: deliveryResponse.receiver, field: "Nombre del comprador", icon: Icons.person),
-                _cardDetail(data: deliveryResponse.phone, field: "Celular del comprador", icon: Icons.phone_android),
+                _cardDetail(
+                    data: deliveryResponse.address,
+                    field: "Dirección del comprador",
+                    icon: Icons.home),
+                _cardDetail(
+                    data: deliveryResponse.receiver,
+                    field: "Nombre del comprador",
+                    icon: Icons.person),
+                _cardDetail(
+                    data: deliveryResponse.phone,
+                    field: "Celular del comprador",
+                    icon: Icons.phone_android),
                 _mapView(delivery: deliveryResponse),
               ],
             ),
@@ -82,7 +90,8 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         Container(
           child: Card(
             elevation: 5,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Column(
               children: [
                 ListTile(
@@ -108,7 +117,8 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         Container(
           child: Card(
             elevation: 5,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Column(
               children: [
                 Container(height: 10),
@@ -124,10 +134,12 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                 Container(height: 10),
                 InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, 'map_view', arguments: delivery);
+                    Navigator.pushNamed(context, 'map_view',
+                        arguments: delivery);
                   },
                   child: FadeInImage(
-                    image: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&markers=color:red%7C$lat,$lng&zoom=16&size=2000x2000&key=AIzaSyDszjoQPzSF_ddL2pXODJy2nwZoT2IfYGI'),
+                    image: NetworkImage(
+                        'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$lng&markers=color:red%7C$lat,$lng&zoom=16&size=2000x2000&key=AIzaSyDszjoQPzSF_ddL2pXODJy2nwZoT2IfYGI'),
                     placeholder: AssetImage('assets/google-maps-loading.gif'),
                     fadeInDuration: Duration(milliseconds: 500),
                     fit: BoxFit.cover,
@@ -162,103 +174,114 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         context: context,
         builder: (BuildContext ctx) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)),
             title: const Text("¿Seguro que quieres iniciar el viaje?"),
             actions: [
               TextButton(
                 child: const Text('Sí'),
                 onPressed: () async {
                   //if (preferences.getDeliveryStarted() != 0) {
-                    int pk = deliveryResponse.pk;
-                    LocationPermission permission;
-                    permission = await Geolocator.checkPermission();
-                    if (permission == LocationPermission.denied) {
-                      permission = await Geolocator.requestPermission();
-                      if (permission == LocationPermission.denied ||
-                          permission == LocationPermission.deniedForever) {
+                  int pk = deliveryResponse.pk;
+                  LocationPermission permission;
+                  permission = await Geolocator.checkPermission();
+                  if (permission == LocationPermission.denied) {
+                    permission = await Geolocator.requestPermission();
+                    if (permission == LocationPermission.denied ||
+                        permission == LocationPermission.deniedForever) {
+                      Navigator.of(ctx).pop();
+                      DialogService.mostrarAlert(
+                          context: context,
+                          title: 'No se puede acceder a tu ubicación',
+                          subtitle:
+                              'Es necesario habilitar los permisos de ubicación para la aplicación.');
+                      return;
+                    }
+                  }
+
+                  ///Se obtiene la posición actual de morotizado
+                  Position currentPosition =
+                      await Geolocator.getCurrentPosition();
+                  // print("Posición actual: Lat ${currentPosition
+                  //    .latitude} Lng ${currentPosition.longitude}");
+                  StartEndTrip startEndTrip = StartEndTrip(
+                      state: DeliveryState.Begin,
+                      bikerLat: currentPosition.latitude,
+                      bikerLng: currentPosition.longitude);
+                  // print("Pk: $pk JSON: ${startEndTrip.toJson()}");
+                  ClientService.changeDeliveryState(
+                          deliveryId: pk, body: startEndTrip.toJson())
+                      .then((res) async {
+                    if (res.statusCode == 200) {
+                      final body = jsonDecode(res.body);
+                      if (body['success'] == false) {
                         Navigator.of(ctx).pop();
-                        DialogService.mostrarAlert(context: context,
-                            title: 'No se puede acceder a tu ubicación',
-                            subtitle: 'Es necesario habilitar los permisos de ubicación para la aplicación.');
+                        DialogService.mostrarAlert(
+                            context: context,
+                            title: 'No se pudo iniciar el viaje',
+                            subtitle:
+                                'Compruebe los permisos de ubicación en inténtelo nuevamente.');
                         return;
                       }
-                    }
+                      Navigator.of(ctx).pop();
 
-                    ///Se obtiene la posición actual de morotizado
-                    Position currentPosition = await Geolocator
-                        .getCurrentPosition();
-                    // print("Posición actual: Lat ${currentPosition
-                    //    .latitude} Lng ${currentPosition.longitude}");
-                    StartEndTrip startEndTrip = StartEndTrip(
-                        state: DeliveryState.Begin,
-                        bikerLat: currentPosition.latitude,
-                        bikerLng: currentPosition.longitude);
-                    // print("Pk: $pk JSON: ${startEndTrip.toJson()}");
-                    ClientService.changeDeliveryState(
-                        deliveryId: pk, body: startEndTrip.toJson()).then((
-                        res) async {
-                      if (res.statusCode == 200) {
-                        final body = jsonDecode(res.body);
-                        if (body['success'] == false) {
-                          Navigator.of(ctx).pop();
-                          DialogService.mostrarAlert(context: context,
-                              title: 'No se pudo iniciar el viaje',
-                              subtitle: 'Compruebe los permisos de ubicación en inténtelo nuevamente.');
+                      ///reenvio de ETA al websocket
+                      final tiempoLlegada = body['ETA'];
+                      // print("Start trip response: ${res.body}");
+                      UpdateEta updateEta = UpdateEta(
+                          updateEta: true,
+                          pk: pk,
+                          eta: tiempoLlegada,
+                          lat: currentPosition.latitude,
+                          lng: currentPosition.longitude);
+                      String username = await StorageService.getUsername();
+                      if (username.isEmpty) {
+                        http.Response res = await ClientService.getUsername();
+                        if (res.statusCode == 200) {
+                          final body = jsonDecode(res.body);
+                          username = body['username'];
+                          await StorageService.saveUsername(username);
+                        } else {
+                          // print("[ERROR]: when fetching username");
                           return;
                         }
-                        Navigator.of(ctx).pop();
-
-                        ///reenvio de ETA al websocket
-                        final tiempoLlegada = body['ETA'];
-                        // print("Start trip response: ${res.body}");
-                        UpdateEta updateEta = UpdateEta(updateEta: true,
-                            pk: pk,
-                            eta: tiempoLlegada,
-                            lat: currentPosition.latitude,
-                            lng: currentPosition.longitude);
-                        String username = await StorageService.getUsername();
-                        if (username.isEmpty) {
-                          http.Response res = await ClientService.getUsername();
-                          if (res.statusCode == 200) {
-                            final body = jsonDecode(res.body);
-                            username = body['username'];
-                            await StorageService.saveUsername(username);
-                          } else {
-                            // print("[ERROR]: when fetching username");
-                            return;
-                          }
-                        }
-                        // print("Username: $username");
-                        // print("Envío ETA al websocket");
-                        // print(updateEta.toJson());
-                        ClientService.sendEtaToWebsocket(
-                            username: username, body: updateEta.toJson());
-                        DialogService.mostrarAlert(context: context,
-                            title: "Éxito",
-                            subtitle: "El viaje se ha iniciado.");
-                        preferences.saveDeliveryStarted(pk);
-                        setState(() {
-                          buttonText = 'Finalizar viaje';
-                          buttonIcon = Icons.check;
-                          buttonColor = primaryColor;
-                        });
-
-                        ///Enviar mensaje por WhatsApp
-                        String number = "+51${deliveryResponse.phone}";
-                        String message = _getTrackDeliveryMessage(deliveryResponse.token);
-                        final whatsAppLink = WhatsAppUnilink(
-                          phoneNumber: number,
-                          text: message,
-                        );
-                        await launch('$whatsAppLink');
-
-                      } else {
-                        Navigator.of(context).pop();
-                        DialogService.mostrarAlert(context: context,
-                            title: 'Error de conexión con el servidor',
-                            subtitle: 'Compruebe su conexión e inténtelo nuevamente.');
                       }
-                    });
+                      // print("Username: $username");
+                      // print("Envío ETA al websocket");
+                      // print(updateEta.toJson());
+                      ClientService.sendEtaToWebsocket(
+                          username: username, body: updateEta.toJson());
+                      DialogService.mostrarAlert(
+                          context: context,
+                          title: "Éxito",
+                          subtitle: "El viaje se ha iniciado.");
+                      preferences.saveDeliveryStarted(pk);
+                      setState(() {
+                        buttonText = 'Finalizar viaje';
+                        buttonIcon = Icons.check;
+                        buttonColor = primaryColor;
+                      });
+
+                      ///Enviar mensaje por WhatsApp
+                      String number = "+51${deliveryResponse.phone}";
+                      String message = _getTrackDeliveryMessage(
+                          deliveryResponse.token,
+                          deliveryResponse.brand,
+                          deliveryResponse.receiver);
+                      final whatsAppLink = WhatsAppUnilink(
+                        phoneNumber: number,
+                        text: message,
+                      );
+                      await launch('$whatsAppLink');
+                    } else {
+                      Navigator.of(context).pop();
+                      DialogService.mostrarAlert(
+                          context: context,
+                          title: 'Error de conexión con el servidor',
+                          subtitle:
+                              'Compruebe su conexión e inténtelo nuevamente.');
+                    }
+                  });
                   /*} else {
                     Navigator.of(ctx).pop();
                     DialogService.mostrarAlert(context: context,
@@ -275,24 +298,24 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
               ),
             ],
           );
-        }
-    );
+        });
   }
 
-  String _getTrackDeliveryMessage(String token) {
-    if (Platform.isAndroid) {
-      return "¡Hola! 👋\nRastrea tu pedido aquí 👇\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+  var parser = EmojiParser();
+
+  String _getTrackDeliveryMessage(String token, String brand, String receiver) {
+    if (brand != null && receiver != null) {
+      return parser.emojify(
+          '¡Hola $receiver! :wave:\nRastrea tu pedido de $brand aquí :point_down: :\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!');
     } else {
-      return "¡Hola!\nRastrea tu pedido aquí:\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!";
+      return parser.emojify(
+          '¡Hola! :wave:\nRastrea tu pedido aquí :point_down: :\n${CommonService.baseUrl}/deliveries/$token\n¡Gracias!');
     }
   }
 
   String _getFinishedDeliveryMessage(String token) {
-    if (Platform.isAndroid) {
-      return "¡Hola de nuevo! 👋\nTu pedido ha llegado a su destino.";
-    } else {
-      return "¡Hola de nuevo!\nTu pedido ha llegado a su destino.";
-    }
+    return parser
+        .emojify("¡Hola de nuevo! :wave:\nTu pedido ha llegado a su destino.");
   }
 
   void _confirmFinishDelivery(BuildContext context) {
@@ -300,33 +323,46 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
         context: context,
         builder: (BuildContext ctx) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0)),
             title: Text("¿Seguro que quieres finalizar el viaje?"),
             actions: [
               TextButton(
                 child: Text("Sí"),
                 onPressed: () {
                   int pk = deliveryResponse.pk;
-                  StartEndTrip startEndTrip = StartEndTrip(state: DeliveryState.End);
-                  ClientService.completeDelivery(id: pk, body: startEndTrip.toJson()).then((res) async {
+                  StartEndTrip startEndTrip =
+                      StartEndTrip(state: DeliveryState.End);
+                  ClientService.completeDelivery(
+                          id: pk, body: startEndTrip.toJson())
+                      .then((res) async {
                     if (res.statusCode == 200) {
                       // print("Pedido marcado como completado");
                       ///funciona pero da exception por alguna razon
                       Navigator.of(context).pop();
                       String number = "+51${deliveryResponse.phone}";
-                      String message = _getFinishedDeliveryMessage(deliveryResponse.token);
+                      String message =
+                          _getFinishedDeliveryMessage(deliveryResponse.token);
                       final whatsAppLink = WhatsAppUnilink(
                         phoneNumber: number,
                         text: message,
                       );
                       await launch('$whatsAppLink');
-                      DialogService.mostrarAlert(context: context, title: "Éxito", subtitle: "El pedido se ha finalizado.", popUntilDeliveriesPage: true);
+                      DialogService.mostrarAlert(
+                          context: context,
+                          title: "Éxito",
+                          subtitle: "El pedido se ha finalizado.",
+                          popUntilDeliveriesPage: true);
                       preferences.removeDeliveryStarted();
                     } else {
                       // print("Error en marcar pedido como completado, intentar de nuevo");
                       //TODO: se tiene que meterle dismiss a este dialog
                       Navigator.of(context).pop();
-                      DialogService.mostrarAlert(context: context, title: "Ups", subtitle: "Ocurrió un error. Por favor, inténtalo más tarde.");
+                      DialogService.mostrarAlert(
+                          context: context,
+                          title: "Ups",
+                          subtitle:
+                              "Ocurrió un error. Por favor, inténtalo más tarde.");
                       // Navigator.of(ctx).pop();
                     }
                   });
@@ -340,11 +376,6 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
               ),
             ],
           );
-        }
-    );
+        });
   }
-
-
-
 }
-

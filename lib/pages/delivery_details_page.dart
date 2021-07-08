@@ -361,9 +361,8 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       DialogService.mostrarAlert(
                           context: context,
                           title: "Ups",
-                          //subtitle:
-                          //"Ocurrió un error. Por favor, inténtalo más tarde."
-                          subtitle: res.statusCode.toString());
+                          subtitle:
+                              "Ocurrió un error. Por favor, inténtalo más tarde.");
                       // Navigator.of(ctx).pop();
                     }
                   });

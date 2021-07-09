@@ -72,7 +72,7 @@ class ClientService {
   }
 
   /// enviar ETA al websocket
-  static void sendEtaToWebsocket({String username, Map<String, dynamic> body}) {
+  static void sendEtaToWebsocket({String username, int pk, String eta, double lat, double lng }) {
     IOWebSocketChannel channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
     // print("${CommonService.wsBaseUrl}/$username/");
 
@@ -80,8 +80,16 @@ class ClientService {
       // print("WS response: $event");
     });
 
-    channel.sink.add(jsonEncode(body));
-
+    channel.sink.add(
+        jsonEncode({
+          'message': jsonEncode({
+            'update_eta': true,
+            'pk': pk,
+            'eta': eta,
+            'lat': lat,
+            'lng': lng,
+          })
+        }));
     channel.sink.close();
   }
 

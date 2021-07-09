@@ -32,20 +32,20 @@ class LocationService {
         username = body['username'];
         await StorageService.saveUsername(username);
       } else {
-        // print("[ERROR]: when fetching username");
+        print("[ERROR]: when fetching username");
         return;
       }
     }
 
-    // print("WEBSOCKET: ${CommonService.wsBaseUrl}/$username/");
+    print("WEBSOCKET: ${CommonService.wsBaseUrl}/$username/");
 
     _channel = IOWebSocketChannel.connect(Uri.parse("${CommonService.wsBaseUrl}/$username/"));
 
     /// lo de abajo es para debugging
     //TODO: comentar antes del deploy
-    // _channel.stream.listen((event) {
-      // print("WS response: $event");
-    // });
+    _channel.stream.listen((event) {
+       print("WS response: $event");
+     });
 
     BackgroundLocation.setAndroidNotification(
       title: "Compartiendo tu ubicación...",

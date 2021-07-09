@@ -250,7 +250,11 @@ class _DeliveryDetailsPageState extends State<DeliveryDetailsPage> {
                       // print("Envío ETA al websocket");
                       // print(updateEta.toJson());
                       ClientService.sendEtaToWebsocket(
-                          username: username, body: updateEta.toJson());
+                          username: username,
+                          pk: pk,
+                          eta: tiempoLlegada,
+                          lat: currentPosition.latitude,
+                          lng: currentPosition.longitude);
                       DialogService.mostrarAlert(
                           context: context,
                           title: "Éxito",
